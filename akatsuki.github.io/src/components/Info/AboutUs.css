@@ -1,0 +1,22 @@
+.about-us {
+  max-width: 600px;
+  z-index: 1;
+  background-color:  rgba(17, 17, 17, 0.9);
+  padding: 30px;
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  margin-left: 20px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.description {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: white;
+}

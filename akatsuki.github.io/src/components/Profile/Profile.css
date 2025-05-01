@@ -1,0 +1,173 @@
+/* Profile sidebar styling */
+.profile-sidebar {
+  position: fixed;
+  top: 70px;
+  right: -350px; /* Hidden by default */
+  width: 300px;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(174, 18, 24, 0.5);
+  box-shadow: -3px 0 10px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 12px;
+  opacity: 0;
+  transition: right 0.7s ease-in-out, opacity 0.9s ease-in-out;
+  color: white;
+  z-index: 1000;
+}
+
+.profile-sidebar.active {
+  right: 30px; /* Show when active */
+  opacity: 1;
+}
+
+.profile-sidebar.unactive {
+  right: -350px; /* Hide when inactive */
+  opacity: 0;
+}
+
+.profile-title {
+  margin: 0 0 15px;
+  font-size: 24px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.profile-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.profile-info-item {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.profile-info-item strong {
+  margin-right: 5px;
+  color: #cccccc;
+}
+
+.xp-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.rank-progress-container {
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.next-rank-label {
+  color: rgb(174, 18, 24);
+  font-weight: bold;
+}
+
+.progress-container {
+  height: 10px;
+  background-color: #3a3a3a;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  width: 0%; /* Initial value */
+  height: 100%;
+  background-color: rgb(174, 18, 24);
+  transition: width 1s ease-in-out;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.settings-btn, .logout-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border-radius: 6px;
+  background-color: transparent;
+  border: 1px solid #3a3a3a;
+  color: #cccccc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-btn:hover {
+  background-color: rgba(174, 18, 24, 0.2);
+  color: rgb(174, 18, 24);
+  border-color: rgba(174, 18, 24, 0.5);
+}
+
+.logout-button:hover {
+  background-color: rgba(174, 18, 24, 0.2);
+  color: rgb(174, 18, 24);
+  border-color: rgba(174, 18, 24, 0.5);
+}
+
+.settings-btn img, .logout-button img {
+  width: 18px;
+  height: 18px;
+}
+
+/* Overlay for closing the sidebar */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* Loading indicator */
+.loading-profile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  color: #cccccc;
+  font-size: 14px;
+}
+
+.loading-profile::after {
+  content: "";
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  border-radius: 50%;
+  border: 2px solid #3a3a3a;
+  border-top-color: rgb(174, 18, 24);
+  animation: loading-spinner 0.8s linear infinite;
+}
+
+@keyframes loading-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Media queries for responsive design */
+@media (max-width: 600px) {
+  .profile-sidebar {
+    width: 280px;
+    right: -280px;
+  }
+  
+  .profile-sidebar.active {
+    right: 15px;
+  }
+}

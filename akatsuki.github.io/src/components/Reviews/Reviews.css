@@ -1,0 +1,206 @@
+.testimonials-section {
+    padding: 4rem 2rem;
+    margin: 2rem 0;
+    position: relative;
+    overflow: hidden;
+    background-color: #000;
+  }
+  
+  .testimonials-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .red-text {
+    color: #ff3b3b;
+  }
+  
+  .white-text {
+    color: #ffffff;
+  }
+  
+  .testimonials-container {
+    width: 100%;
+    overflow-x: hidden; /* Оставляем hidden для авто-прокрутки */
+    padding: 1.5rem 0;
+    position: relative;
+  }
+  
+  .testimonials-container:after, .testimonials-container:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 80px;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .testimonials-container:before {
+    left: 0;
+    background: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0));
+  }
+  
+  .testimonials-container:after {
+    right: 0;
+    background: linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0));
+  }
+  
+  .testimonials-wrapper {
+    display: flex;
+    gap: 30px; /* Увеличенный промежуток между карточками */
+    padding: 0 1rem;
+    width: max-content; /* Важно! Это предотвращает сжатие */
+  }
+  
+  .testimonial-card {
+    flex: 0 0 350px; /* Фиксированная ширина */
+    width: 350px; /* Явная ширина */
+    min-width: 350px; /* Минимальная ширина */
+    background-color: #1a1a1a;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: visible; /* Изменено с hidden на visible */
+    box-sizing: border-box;
+  }
+  
+  .testimonial-card:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #ff3b3b, transparent);
+  }
+  
+  .testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(255, 59, 59, 0.2);
+  }
+  
+  .testimonial-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #2a2a2a;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 2px solid #ff3b3b;
+    box-shadow: 0 0 10px rgba(255, 59, 59, 0.3);
+  }
+  
+  .testimonial-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .testimonial-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 0.3rem;
+    width: 100%;
+    white-space: normal;
+    overflow: visible;
+    word-wrap: break-word;
+  }
+  
+  .testimonial-role {
+    color: #ff3b3b;
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+    width: 100%;
+  }
+  
+  .testimonial-rating {
+    margin-bottom: 1rem;
+    color: #ffc107;
+    letter-spacing: 2px;
+  }
+  
+  .star {
+    font-size: 1.1rem;
+  }
+  
+  .star.empty {
+    color: #444;
+  }
+  
+  .star.half {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .star.half:after {
+    content: "☆";
+    position: absolute;
+    left: 0;
+    color: #444;
+    width: 50%;
+    overflow: hidden;
+  }
+  
+  .testimonial-text {
+    color: #b0b0b0;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-style: italic;
+    margin-bottom: 1rem;
+    position: relative;
+    width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .testimonial-date {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: auto;
+  }
+  
+  /* Анимация появления */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .testimonial-card {
+    animation: fadeIn 0.5s ease forwards;
+    animation-delay: calc(var(--index) * 0.1s);
+    opacity: 0;
+  }
+  
+  /* Респонсивность */
+  @media (max-width: 768px) {
+    .testimonials-title {
+      font-size: 2rem;
+    }
+    
+    .testimonial-card {
+      min-width: 320px;
+      max-width: 320px;
+      width: 320px;
+      padding: 1.5rem;
+    }
+  }

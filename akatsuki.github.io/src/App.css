@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@300..700&display=swap');
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  font-family: "Jura", sans-serif;
+  background-color: #000;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  background-image: url("/src/assets/images/bg_aka.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
+  /* Add top padding to account for the fixed header */
+  padding-top: 120px; /* 100px header height + 20px extra space */
+}
+
+.about-itachi-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.main-content {
+  flex: 1;
+  overflow: auto;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+a {
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+.sakura {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-image: url("cursor_anim.png");
+  background-size: cover;
+  animation: float 2s linear forwards;
+}
+
+.glow-button {
+  background: linear-gradient(45deg, #ff416c, #ff4b2b);
+  padding: 15px 30px;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s;
+  opacity: 0;
+  animation: fadeIn 1s forwards;
+}
+
+.glow-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 65, 108, 0.8);
+}
+
+.section-spacing {
+  margin-top: 10rem;
+  margin-bottom: 10rem;
+}

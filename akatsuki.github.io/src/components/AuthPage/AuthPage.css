@@ -1,0 +1,153 @@
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #0c0c0c;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("../../assets/images/bg-pattern.png");
+}
+
+.auth-card {
+  width: 400px;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 0 20px rgba(174, 18, 24, 0.3);
+  border: 1px solid rgba(174, 18, 24, 0.5);
+}
+
+.auth-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.auth-logo img {
+  height: 60px;
+}
+
+.auth-card h2 {
+  color: white;
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 24px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  color: #cccccc;
+  font-size: 14px;
+}
+
+.form-group input {
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  color: white;
+  font-size: 16px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: rgba(174, 18, 24, 0.8);
+}
+
+/* Стили для группы с верификацией */
+.verification-input-container {
+  display: flex;
+  gap: 10px;
+}
+
+.verification-input-container input {
+  flex: 1;
+}
+
+.send-code-btn {
+  padding: 0 15px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.send-code-btn:hover {
+  background-color: #444;
+}
+
+.send-code-btn:disabled {
+  background-color: #222;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.auth-btn {
+  margin-top: 10px;
+  padding: 12px;
+  background-color: rgb(174, 18, 24);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.auth-btn:hover {
+  background-color: rgba(174, 18, 24, 0.8);
+}
+
+.auth-toggle {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.auth-toggle p {
+  color: #cccccc;
+}
+
+.auth-toggle span {
+  color: rgb(174, 18, 24);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.auth-toggle span:hover {
+  text-decoration: underline;
+}
+
+.auth-error {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  color: #ff6b6b;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.auth-success {
+  background-color: rgba(0, 128, 0, 0.1);
+  border: 1px solid rgba(0, 128, 0, 0.3);
+  color: #4caf50;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}

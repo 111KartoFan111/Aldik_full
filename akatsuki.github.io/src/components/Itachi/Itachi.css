@@ -1,0 +1,50 @@
+.hero-section {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+  .hero-block {
+    display: flex;
+    gap: 123px;
+    margin-bottom: 60px;
+  }
+  .hero-title {
+    font-size: 60px;
+    width: 531px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 77px;
+    color: #000000;
+    margin-bottom: 35px;
+  }
+  .hero-right {
+    width: 640px;
+  }
+  .hero-subtitle {
+    width: 498px;
+  
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 28px;
+    /* or 140% */
+  
+    color: #000000;
+    margin-bottom: 35px;
+  }
+  
+  .hero-btn {
+    font-family: "Space Grotesk";
+    font-size: 20px;
+    background-color: #000000;
+    color: #ffffff;
+    cursor: pointer;
+    width: 264px;
+    height: 68px;
+    border-radius: 14px;
+    border: 1px solid #000000;
+  }
+  .hero-btn:hover {
+    background-color: transparent;
+    color: #000000;
+  }
+  

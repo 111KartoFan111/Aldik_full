@@ -1,0 +1,93 @@
+.tutorial-container {
+    padding: 3rem 1rem;
+    margin: 2rem 0;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .tutorial-title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  
+  .red-text {
+    color: #ff3b3b;
+  }
+  
+  .white-text {
+    color: #ffffff;
+  }
+  
+  .tutorial-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .tutorial-card {
+    display: flex;
+    align-items: flex-start;
+    background-color: #1a1a1a;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
+    height: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  .tutorial-card:hover {
+    transform: scale(1.03);
+  }
+  
+  .tutorial-card-icon {
+    flex-shrink: 0;
+    margin-right: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .tutorial-card-icon img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .tutorial-card-content {
+    flex-grow: 1;
+  }
+  
+  .tutorial-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+  }
+  
+  .tutorial-card-description {
+    color: #b0b0b0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  /* Responsive styles */
+  @media screen and (max-width: 768px) {
+    .tutorial-cards-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .tutorial-title {
+      font-size: 1.75rem;
+    }
+    
+    .tutorial-card {
+      padding: 1.25rem;
+    }
+    
+    .tutorial-card-title {
+      font-size: 1.25rem;
+    }
+  }

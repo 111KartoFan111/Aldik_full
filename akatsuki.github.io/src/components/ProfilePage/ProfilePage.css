@@ -1,0 +1,897 @@
+.profile-page {
+    background-color: #0c0c0c;
+    color: white;
+    min-height: 100vh;
+  }
+  
+  .profile-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 100px auto 50px;
+    gap: 30px;
+    padding: 0 20px;
+  }
+  
+  .sidebar {
+    width: 280px;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(174, 18, 24, 0.5);
+    height: fit-content;
+    position: sticky;
+    top: 120px;
+  }
+  
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #2a2a2a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    border: 2px solid rgb(174, 18, 24);
+  }
+  
+  .user-avatar img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .user-details {
+    text-align: center;
+  }
+  
+  .user-details h3 {
+    margin: 0 0 5px;
+    font-size: 18px;
+  }
+  
+  .user-details p {
+    margin: 0 0 10px;
+    color: #cccccc;
+    font-size: 14px;
+  }
+  
+  .xp-bar {
+    height: 6px;
+    background-color: #2a2a2a;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 5px;
+  }
+  
+  .xp-progress {
+    height: 100%;
+    background-color: rgb(174, 18, 24);
+  }
+  
+  .xp-text {
+    font-size: 12px !important;
+    color: #aaaaaa !important;
+  }
+  
+  .profile-nav {
+    margin-top: 20px;
+  }
+  
+  .profile-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .profile-nav li {
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+  }
+  
+  .profile-nav li:hover {
+    background-color: #2a2a2a;
+  }
+  
+  .profile-nav li.active {
+    background-color: rgba(174, 18, 24, 0.2);
+    color: rgb(174, 18, 24);
+  }
+  
+  .profile-nav .icon {
+    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .profile-nav .icon img {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .logout-btn {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #2a2a2a;
+    text-align: center;
+  }
+  
+  .logout-btn a {
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+  
+  .logout-btn a:hover {
+    color: rgb(174, 18, 24);
+  }
+  
+  .profile-content {
+    flex: 1;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid rgba(174, 18, 24, 0.5);
+  }
+  
+  /* Overview styles */
+  .profile-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .user-stats {
+    display: flex;
+    gap: 20px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  
+  .user-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #2a2a2a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid rgb(174, 18, 24);
+  }
+  
+  .user-avatar-large img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .user-info-large {
+    flex: 1;
+  }
+  
+  .user-info-large h2 {
+    margin: 0 0 15px;
+    font-size: 28px;
+  }
+  
+  .rank-info {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 15px;
+  }
+  
+  .rank-title {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  
+  .progress-container {
+    height: 10px;
+    background-color: #3a3a3a;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    background-color: rgb(174, 18, 24);
+  }
+  
+  .xp-info, .next-rank {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #cccccc;
+  }
+  
+  .profile-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .profile-section h3 {
+    margin: 0 0 15px;
+    font-size: 20px;
+  }
+  
+  .active-courses {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .course-card {
+    display: flex;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .course-imagee {
+    width: 120px;
+    height: 90px;
+    background-color: #3a3a3a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .course-image img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  .course-info {
+    flex: 1;
+    padding: 15px;
+  }
+  
+  .course-info h4 {
+    margin: 0 0 10px;
+    font-size: 16px;
+  }
+  
+  .course-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .course-progress .progress-container {
+    flex: 1;
+  }
+  
+  .continue-btn {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: rgb(174, 18, 24);
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
+  }
+  
+  .continue-btn:hover {
+    background-color: rgba(174, 18, 24, 0.8);
+  }
+  
+  .certificates-preview {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .certificate-card {
+    flex: 1;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .certificate-image {
+    height: 150px;
+    background-color: #3a3a3a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .certificate-info {
+    padding: 15px;
+  }
+  
+  .certificate-info h4 {
+    margin: 0 0 5px;
+    font-size: 16px;
+  }
+  
+  .certificate-info p {
+    margin: 0;
+    color: #cccccc;
+    font-size: 14px;
+  }
+  
+  .view-all-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: transparent;
+    border: 1px solid #3a3a3a;
+    color: #cccccc;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.2s;
+  }
+  
+  .view-all-btn:hover {
+    background-color: #2a2a2a;
+    color: white;
+  }
+  
+  /* Courses tab styles */
+  .profile-courses h2, 
+  .profile-certificates h2,
+  .profile-settings h2 {
+    margin: 0 0 25px;
+    font-size: 24px;
+  }
+  
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .course-card-full {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .course-card-full .course-image {
+    width: 100%;
+    height: 160px;
+  }
+  
+  .course-details {
+    padding: 15px;
+    flex: 1;
+  }
+  
+  .course-details h3 {
+    margin: 0 0 15px;
+    font-size: 18px;
+  }
+  
+  .course-actions {
+    padding: 0 15px 15px;
+  }
+  
+  .course-actions .continue-btn {
+    display: block;
+    text-align: center;
+  }
+  
+  /* Certificates tab styles */
+  .certificates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .certificate-card-full {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .certificate-card-full .certificate-image {
+    width: 100%;
+    height: 200px;
+  }
+  
+  .certificate-details {
+    padding: 15px;
+  }
+  
+  .certificate-details h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+  }
+  
+  .certificate-details p {
+    margin: 0 0 15px;
+    color: #cccccc;
+  }
+  
+  .download-btn {
+    padding: 8px 15px;
+    background-color: rgb(174, 18, 24);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .download-btn:hover {
+    background-color: rgba(174, 18, 24, 0.8);
+  }
+  
+  /* Settings tab styles */
+  .settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .settings-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .settings-form label {
+    font-size: 16px;
+  }
+  
+  .settings-form input {
+    padding: 12px;
+    background-color: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    color: white;
+    font-size: 16px;
+  }
+  
+  .settings-form input:focus {
+    outline: none;
+    border-color: rgba(174, 18, 24, 0.8);
+  }
+  
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .checkbox-group input {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .save-btn {
+    padding: 12px;
+    background-color: rgb(174, 18, 24);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+  }
+  
+  .save-btn:hover {
+    background-color: rgba(174, 18, 24, 0.8);
+  }
+  
+  /* Мобильная адаптация */
+  @media (max-width: 900px) {
+    .profile-container {
+      flex-direction: column;
+    }
+    
+    .sidebar {
+      width: 100%;
+      position: relative;
+      top: 0;
+    }
+    
+    .user-stats {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .certificates-preview {
+      flex-direction: column;
+    }
+    
+    .courses-grid,
+    .certificates-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .auth-card {
+      width: 90%;
+      padding: 20px;
+    }
+  }
+  /* Стили для загрузчика */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+}
+
+.loading-indicator {
+  text-align: center;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(174, 18, 24, 0.3);
+  border-radius: 50%;
+  border-top-color: rgb(174, 18, 24);
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Стили для ошибок */
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+}
+
+.error-message {
+  text-align: center;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  padding: 30px;
+  max-width: 500px;
+}
+
+.error-message h2 {
+  color: rgb(174, 18, 24);
+  margin-top: 0;
+}
+
+.error-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.error-actions button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.error-actions button:first-child {
+  background-color: rgb(174, 18, 24);
+  color: white;
+}
+
+.error-actions button:first-child:hover {
+  background-color: rgba(174, 18, 24, 0.8);
+}
+
+.error-actions button:last-child {
+  background-color: transparent;
+  border: 1px solid #3a3a3a;
+  color: #cccccc;
+}
+
+.error-actions button:last-child:hover {
+  background-color: #2a2a2a;
+  color: white;
+}
+
+/* Стили для пустых секций */
+.no-courses, .no-certificates, .no-courses-full {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+}
+
+.no-courses p, .no-certificates p, .no-courses-full p {
+  margin-bottom: 20px;
+  color: #cccccc;
+}
+
+.browse-courses-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: rgb(174, 18, 24);
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.browse-courses-btn:hover {
+  background-color: rgba(174, 18, 24, 0.8);
+}
+
+/* Стили для сообщений формы */
+.form-message {
+  padding: 12px 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.form-message.success {
+  background-color: rgba(39, 174, 96, 0.2);
+  color: #2ecc71;
+  border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.form-message.error {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+/* Дополнительные стили для профиля */
+.profile-loading {
+  text-align: center;
+  padding: 20px;
+  color: #cccccc;
+}
+
+.profile-error {
+  color: #e74c3c;
+  padding: 15px;
+  margin: 10px 0;
+  background-color: rgba(231, 76, 60, 0.1);
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* Адаптивные стили для профиля */
+@media (max-width: 768px) {
+  .profile-container {
+    flex-direction: column;
+    margin-top: 80px;
+  }
+  
+  .sidebar {
+    width: 100%;
+    margin-bottom: 20px;
+    position: relative;
+    top: 0;
+    order: 1;
+  }
+  
+  .profile-content {
+    order: 2;
+  }
+  
+  .user-stats {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .user-info-large {
+    margin-top: 20px;
+  }
+}
+
+/* Стили для боковой панели профиля в мобильном виде */
+@media (max-width: 480px) {
+  .profile-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  
+  .profile-nav li {
+    flex: 1 0 calc(50% - 5px);
+    min-width: 120px;
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .user-avatar img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .certificates-preview {
+    flex-direction: column;
+  }
+}
+
+/* Стили для курсов и сертификатов на мобильных устройствах */
+@media (max-width: 640px) {
+  .courses-grid, .certificates-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .course-card {
+    flex-direction: column;
+  }
+  
+  .course-imagee {
+    width: 100%;
+    height: 120px;
+  }
+}
+/* Добавьте эти стили в конец вашего файла ProfilePage.css */
+
+/* Стили для индикатора загрузки */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  color: #cccccc;
+  font-size: 16px;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  min-height: 150px;
+}
+
+.loading::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  margin-left: 12px;
+  border-radius: 50%;
+  border: 3px solid #3a3a3a;
+  border-top-color: rgb(174, 18, 24);
+  animation: profile-loading-spinner 0.8s linear infinite;
+}
+
+@keyframes profile-loading-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Стили для сообщений об ошибках */
+.error-message {
+  background-color: rgba(255, 59, 48, 0.1);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  color: #ff3b30;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* Стили для успешных сообщений */
+.success-message {
+  background-color: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #4CAF50;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* Стили для пустых состояний */
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  color: #cccccc;
+}
+
+.empty-state p {
+  margin-bottom: 15px;
+}
+
+.add-course-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: rgb(174, 18, 24);
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.add-course-btn:hover {
+  background-color: rgba(174, 18, 24, 0.8);
+}
+
+/* Улучшенный стиль для табов */
+.profile-nav li {
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-nav li::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: rgb(174, 18, 24);
+  transition: width 0.3s ease;
+}
+
+.profile-nav li:hover::after {
+  width: 100%;
+}
+
+.profile-nav li.active::after {
+  width: 100%;
+}
+
+/* Анимация для карточек курсов */
+.course-card, .course-card-full {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.course-card:hover, .course-card-full:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Улучшенный стиль для кнопки выхода */
+.logout-btn a {
+  position: relative;
+  padding-left: 20px;
+}
+
+.logout-btn a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  background-image: url("../../assets/images/Interface/Exit.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.logout-btn a:hover::before {
+  opacity: 1;
+}

@@ -1,0 +1,237 @@
+.languages-swiper-container {
+  width: 100%;
+  padding: 4rem 0;
+  margin-top: 30px;
+  overflow: hidden;
+  perspective: 1000px;
+}
+
+.swiper {
+  width: 100%;
+  padding: 30px 0 50px;
+}
+
+/* Оболочка для слайда */
+.language-card-slide {
+  transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  height: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.language-card {
+  background: linear-gradient(145deg, rgba(25, 25, 25, 0.9), rgba(15, 15, 15, 0.9));
+  border-radius: 15px;
+  overflow: hidden;
+  padding: 1.8rem;
+  height: 380px; /* Увеличиваем высоту для размещения кнопки */
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+}
+
+/* Особые стили для активного слайда */
+.swiper-slide-active .language-card {
+  transform: translateZ(20px) scale(1.05);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 2;
+}
+
+.swiper-slide {
+  opacity: 0.85;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  transform-style: preserve-3d;
+}
+
+.swiper-slide-active {
+  opacity: 1;
+}
+
+.language-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.language-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.language-icon {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 1rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
+  transition: transform 0.3s ease;
+}
+
+.swiper-slide-active .language-icon {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+}
+
+.language-name {
+  font-size: 1.6rem;
+  margin-bottom: 0.8rem;
+  color: white;
+  text-align: center;
+  font-weight: 600;
+  background: linear-gradient(90deg, #e0e0e0, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.language-description {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1.2rem;
+  flex-grow: 1;
+  max-height: 150px; /* Ограничиваем высоту для предотвращения перекрытия кнопки */
+  overflow-y: auto; /* Добавляем прокрутку на случай большого количества текста */
+}
+
+.language-description li {
+  margin-bottom: 0.7rem;
+  font-size: 0.95rem;
+  color: #ddd;
+  line-height: 1.4;
+}
+
+/* Добавляем контейнер для кнопки */
+.button-container {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.learn-button {
+  background: linear-gradient(90deg, #3a3a3a, #505050);
+  border: none;
+  color: white;
+  padding: 0.9rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative; /* Для обеспечения Z-index */
+  z-index: 5; /* Поднимаем кнопку над другими элементами */
+}
+
+.learn-button:hover {
+  background: linear-gradient(90deg, #505050, #606060);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Стилизация HTML+CSS карточки */
+.html-css-icons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.html-css-icons img {
+  width: 55px;
+  height: 55px;
+}
+
+.html-css-icons span {
+  color: #ddd;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Стили для пагинации */
+.swiper-pagination {
+  position: relative;
+  bottom: -10px;
+}
+
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0.5;
+  transition: all 0.4s ease;
+}
+
+.swiper-pagination-bullet-active {
+  background: #fff;
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* Стили для кнопок навигации */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 1.2rem;
+}
+
+/* Стили для активной анимации */
+@keyframes softPulse {
+  0% { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
+  50% { box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6); }
+  100% { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
+}
+
+.swiper-slide-active .language-card {
+  animation: softPulse 3s infinite ease-in-out;
+}
+
+/* Более плавная анимация для всех переходов */
+* {
+  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+}
+
+/* Медиа-запросы для адаптивности */
+@media (max-width: 768px) {
+  .swiper {
+    padding: 20px 0 40px;
+  }
+  
+  .language-card {
+    height: 360px;
+    max-width: 280px;
+    padding: 1.5rem;
+  }
+  
+  .language-name {
+    font-size: 1.4rem;
+  }
+  
+  .language-description li {
+    font-size: 0.9rem;
+  }
+}
