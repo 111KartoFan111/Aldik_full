@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True  # В продакшне установить False
     
     # Настройки базы данных
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:aldik07bak@localhost:5432/akatsuki")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:0000@localhost:5432/akatsuki")
     
     # Настройки JWT
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # Настройки Email
     MAIL_SERVER: str = os.getenv("MAIL_SERVER", "smtp.gmail.com")
     MAIL_PORT: int = int(os.getenv("MAIL_PORT", "587"))
-    MAIL_USERNAME: str = "zarkynismagulov@gmail.com"  
+    MAIL_USERNAME: str = "zarkynismagulov@gmail.com"
     MAIL_PASSWORD: Optional[str] = os.getenv("MAIL_PASSWORD", "ecxr zlzz xzbs scyz")
     MAIL_FROM: str = os.getenv("MAIL_FROM", "zarkynismagulov@gmail.com")
     MAIL_FROM_NAME: str = os.getenv("MAIL_FROM_NAME", "Akatsuki Courses")
