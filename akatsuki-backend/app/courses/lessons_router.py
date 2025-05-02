@@ -286,24 +286,42 @@ def submit_test(
     total_questions = len(questions)
     
     for question_id, option_id in test_data.answers.items():
+        # Преобразуем идентификаторы в целые числа
+        question_id = int(question_id)
+        option_id = int(option_id)
+
         # Находим правильный ответ
         correct_option = db.query(TestOption).filter(
-            TestOption.question_id == int(question_id),
+            TestOption.question_id == question_id,
             TestOption.is_correct == True
         ).first()
-        
-        if correct_option and correct_option.id == int(option_id):
-            correct_answers += 1
-        
-        # Сохраняем ответ пользователя
-        user_answer = UserTestAnswer(
+
+        # Проверяем правильность ответа
+        is_correct = correct_option and correct_option.id == option_id
+
+        # Проверяем, существует ли уже ответ пользователя
+        existing_answer = db.query(UserTestAnswer).filter_by(
             user_id=current_user.id,
-            question_id=int(question_id),
-            selected_option_id=int(option_id),
-            is_correct=correct_option and correct_option.id == int(option_id)
-        )
-        db.add(user_answer)
-    
+            question_id=question_id
+        ).first()
+
+        if existing_answer:
+            # Обновляем существующий ответ
+            existing_answer.selected_option_id = option_id
+            existing_answer.is_correct = is_correct
+        else:
+            # Добавляем новый ответ
+            user_answer = UserTestAnswer(
+                user_id=current_user.id,
+                question_id=question_id,
+                selected_option_id=option_id,
+                is_correct=is_correct
+            )
+            db.add(user_answer)
+
+        if is_correct:
+            correct_answers += 1
+
     # Рассчитываем процент правильных ответов
     score_percent = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
     
