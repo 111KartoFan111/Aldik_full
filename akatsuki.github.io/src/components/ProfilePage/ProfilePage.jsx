@@ -67,8 +67,9 @@ const ProfilePage = () => {
       
       console.log("Данные профиля получены:", userProfile);
       
+      const id = userProfile.id;
       // Получаем курсы пользователя
-      const coursesResponse = await coursesAPI.getUserCourses();
+      const coursesResponse = await coursesAPI.getUserCourses(id);
       const userCourses = coursesResponse.data;
       
       console.log("Курсы пользователя получены:", userCourses);

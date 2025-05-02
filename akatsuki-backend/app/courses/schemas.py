@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr, validator
 from typing import List, Dict, Optional, Any
 from datetime import datetime
 from enum import Enum
@@ -7,7 +7,7 @@ class CourseStatus(str, Enum):
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
 
-# Схемы для курсов
+# Базовые схемы для курсов
 class CourseBase(BaseModel):
     title: str
     description: str

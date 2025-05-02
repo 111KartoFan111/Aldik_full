@@ -14,14 +14,14 @@ import ProfilePage from "./components/ProfilePage/ProfilePage";
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import './App.css';
 
-// Защищенный маршрут как компонент
+// Protected route component that checks authentication
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
-// Главная страница как компонент
+// Home component
 function Home({
   handleLanguageClick,
   handleCourseClick,
@@ -57,24 +57,27 @@ function Home({
   );
 }
 
-// App с роутингом
+// Main App component
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
 
+  // Handler for clicking on a course
   const handleCourseClick = (courseId) => {
     setSelectedCourseId(courseId);
     setSelectedLanguage(null);
     setIsModalOpen(true);
   };
 
+  // Handler for clicking on a programming language
   const handleLanguageClick = (languageName) => {
     setSelectedLanguage(languageName);
     setSelectedCourseId(null);
     setIsModalOpen(true);
   };
 
+  // Scroll to courses section
   const scrollToCourses = () => {
     const coursesSection = document.querySelector('.section-title');
     if (coursesSection) {
@@ -82,6 +85,7 @@ function App() {
     }
   };
 
+  // Close modal handler
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
@@ -89,6 +93,7 @@ function App() {
   return (
     <Router basename="/akatsuki.github.io">
       <Routes>
+        {/* Home route */}
         <Route
           path="/"
           element={
@@ -103,13 +108,20 @@ function App() {
             />
           }
         />
+        
+        {/* Authentication routes */}
         <Route path="/login" element={<AuthPage />} />
+        
+        {/* Profile page (protected) */}
         <Route 
           path="/profile"
           element={
-            <ProfilePage />
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
           }
         />
+        {/* Courses grid view */}
         <Route
           path="/courses"
           element={
@@ -126,27 +138,33 @@ function App() {
                 languageName={selectedLanguage}
                 onViewAllClick={scrollToCourses}
               />
+              <Footer />
             </>
           }
         />
-        {/* Маршрут для интерактивной страницы с видео, тестами и сертификацией */}
+        {/* Course player routes */}
+        {/* Legacy format /courses/:courseId/player */}
         <Route
           path="/courses/:courseId/player"
           element={
-            <div className="course-player-wrapper">
+            <ProtectedRoute>
               <CoursePlayerPage />
-            </div>
+            </ProtectedRoute>
           }
         />
-        {/* Новый маршрут для формата /course/:courseId/lesson/:lessonId */}
+        
+        {/* Main course player route with format /course/:courseId/lesson/:lessonId */}
         <Route
           path="/course/:courseId/lesson/:lessonId"
           element={
-            <div className="course-player-wrapper">
+            <ProtectedRoute>
               <CoursePlayerPage />
-            </div>
+            </ProtectedRoute>
           }
         />
+        
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

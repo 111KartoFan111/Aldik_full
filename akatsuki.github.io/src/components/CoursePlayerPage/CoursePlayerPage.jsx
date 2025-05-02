@@ -18,7 +18,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import Header from "../Header/Header";
 import "./CoursePlayerPage.css";
-import api, { coursesAPI, profileAPI, authAPI } from "../../services/api";
+import { coursesAPI, profileAPI, authAPI } from "../../services/api";
 
 const CoursePlayerPage = () => {
   const { courseId, lessonId } = useParams();
@@ -28,7 +28,7 @@ const CoursePlayerPage = () => {
   const [activeSection, setActiveSection] = useState("intro");
   const [currentStep, setCurrentStep] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [progress, setProgress] = useState(15);
+  const [progress, setProgress] = useState(0);
   const [xp, setXp] = useState(0);
   const [xpToNextLevel, setXpToNextLevel] = useState(500);
   const [codeValue, setCodeValue] = useState("");
@@ -41,15 +41,15 @@ const CoursePlayerPage = () => {
   // State для API данных
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [availableCourses, setAvailableCourses] = useState([]);
   const [userData, setUserData] = useState(null);
-  const [totalSteps, setTotalSteps] = useState(5); // Общее количество шагов в уроке
+  const [totalSteps, setTotalSteps] = useState(5);
   
   // State для пользовательского профиля и сертификата
   const [userPhoto, setUserPhoto] = useState(null);
   const [currentCourse, setCurrentCourse] = useState(null);
   const [currentLesson, setCurrentLesson] = useState(null);
   const [courseModules, setCourseModules] = useState([]);
+  const [allCourses, setAllCourses] = useState([]); // New state for all courses
   
   // State для комментариев и реакций
   const [liked, setLiked] = useState(false);
@@ -59,19 +59,27 @@ const CoursePlayerPage = () => {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState([]);
   
+  // Parsing the lessonId format (e.g., "1.1" => module 1, lesson 1)
+  const parseLessonIdFormat = (id) => {
+    if (!id) return { moduleIndex: 0, lessonIndex: 0 };
+    const parts = id.split('.');
+    if (parts.length === 2) {
+      return {
+        moduleIndex: parseInt(parts[0]) - 1,
+        lessonIndex: parseInt(parts[1]) - 1
+      };
+    }
+    return { moduleIndex: 0, lessonIndex: 0 };
+  };
+  
   // Получение информации о текущем пользователе
   const fetchUserData = async () => {
     try {
       const response = await authAPI.getCurrentUser();
       setUserData(response.data);
-      
-      // Установка XP пользователя
       setXp(response.data.xp || 0);
-      
-      // Вычисление XP до следующего уровня
       const userRank = getRank(response.data.xp);
       setXpToNextLevel(getMaxXP(userRank));
-      
       return response.data;
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -97,135 +105,71 @@ const CoursePlayerPage = () => {
       default: return 1000;
     }
   };
-  
-  // Получение доступных курсов
-  const fetchCourses = async () => {
+
+  // Load course content from API
+  const loadCourseData = async () => {
+    setIsLoading(true);
     try {
-      const response = await coursesAPI.getAllCourses();
-      setAvailableCourses(response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-      setError("Ошибка при загрузке списка курсов");
-    }
-  };
-  
-  // Получение данных конкретного курса
-  const fetchCourseData = async (courseId) => {
-    try {
-      const response = await coursesAPI.getCourseById(courseId);
-      setCurrentCourse(response.data);
+      // Fetch course data
+      const courseResponse = await coursesAPI.getCourseById(courseId);
+      if (!courseResponse.data) {
+        throw new Error(`Course data for ${courseId} not found`);
+      }
       
-      // Получаем модули курса из данных API
-      if (response.data && response.data.modules) {
-        const modules = response.data.modules.map(module => {
-          return {
-            id: module.id,
-            title: module.title,
-            completed: module.completed || false,
-            lessons: module.lessons.map(lesson => ({
-              id: lesson.id,
-              title: lesson.title,
-              completed: lesson.completed || false,
-              current: lesson.id.toString() === lessonId
-            }))
-          };
-        });
-        
-        setCourseModules(modules);
-      } else {
-        // Если модулей нет в ответе API, получаем их отдельно
-        try {
-          const modulesResponse = await api.get(`/courses/${courseId}/modules`);
-          if (modulesResponse.data && Array.isArray(modulesResponse.data)) {
-            setCourseModules(modulesResponse.data);
-          }
-        } catch (moduleError) {
-          console.error("Error fetching modules:", moduleError);
-          // Установим пустой массив модулей вместо undefined
-          setCourseModules([]);
+      setCurrentCourse({
+        id: courseId,
+        title: courseResponse.data.title,
+        modules: courseResponse.data.modules
+      });
+      setCourseModules(courseResponse.data.modules || []);
+      
+      // Fetch lesson data
+      const lessonResponse = await coursesAPI.getLesson(lessonId);
+      if (!lessonResponse.data) {
+        throw new Error(`Lesson ${lessonId} not found`);
+      }
+      
+      setCurrentLesson({
+        ...lessonResponse.data,
+        progress: lessonResponse.data.progress || {
+          intro_completed: false,
+          video_completed: false,
+          practice_completed: false,
+          test_completed: false,
+          test_score: 0,
+          earned_xp: 0,
+          completed: false
         }
+      });
+      
+      // Set initial code value if available
+      if (lessonResponse.data.practice?.codeTemplate) {
+        setCodeValue(lessonResponse.data.practice.codeTemplate);
       }
       
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching course data:", error);
-      setError("Ошибка при загрузке данных курса");
-      // Установим пустой массив модулей вместо undefined
-      setCourseModules([]);
-    }
-  };
-  
-  // Получение данных урока
-  const fetchLessonData = async (courseId, lessonId) => {
-    try {
-      const response = await coursesAPI.getLesson(courseId, lessonId);
-      setCurrentLesson(response.data);
-      
-      // Устанавливаем начальные значения на основе прогресса
-      if (response.data.progress) {
-        if (response.data.progress.intro_completed) {
-          if (response.data.progress.video_completed) {
-            if (response.data.progress.practice_completed) {
-              if (response.data.progress.test_completed) {
-                setCurrentStep(5);
-                setActiveSection("cert");
-              } else {
-                setCurrentStep(4);
-                setActiveSection("test");
-              }
-            } else {
-              setCurrentStep(3);
-              setActiveSection("practice");
-            }
-          } else {
-            setCurrentStep(2);
-            setActiveSection("video");
-          }
-        }
-      }
-      
-      if (response.data.practice && response.data.practice.codeTemplate) {
-        setCodeValue(response.data.practice.codeTemplate);
-      }
-      
-      // Подготавливаем тестовые вопросы
-      if (response.data.test && response.data.test.length > 0) {
+      // Initialize test answers
+      if (lessonResponse.data.test?.length > 0) {
         const initialAnswers = {};
-        response.data.test.forEach((question) => {
+        lessonResponse.data.test.forEach(question => {
           initialAnswers[`question${question.id}`] = "";
         });
         setTestAnswers(initialAnswers);
       }
       
-      return response.data;
+      // Fetch user data
+      await fetchUserData();
+      
+      // Fetch comments
+      const commentsResponse = await coursesAPI.getLessonComments(lessonId);
+      setComments(commentsResponse.data || []);
+      
+      // Fetch all courses for course selector and recommendations
+      const allCoursesResponse = await coursesAPI.getAllCourses();
+      setAllCourses(allCoursesResponse.data || []);
+      
     } catch (error) {
-      console.error("Error fetching lesson data:", error);
-      setError("Ошибка при загрузке данных урока");
-    }
-  };
-  
-  // Получение комментариев для урока
-  const fetchComments = async (courseId, lessonId) => {
-    try {
-      const response = await coursesAPI.getLessonComments(lessonId);
-      setComments(response.data || []);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-      setComments([]);
-    }
-  };
-  
-  // Получение фото пользователя
-  const fetchUserPhoto = async () => {
-    try {
-      setIsLoading(true);
-      // В будущих версиях можно добавить получение фото из API
-      setUserPhoto("/api/placeholder/150/150");
-    } catch (error) {
-      console.error("Error fetching user photo:", error);
-      setUserPhoto("/api/placeholder/150/150");
+      console.error("Error loading course data:", error);
+      setError(`Ошибка при загрузке данных курса: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -233,93 +177,66 @@ const CoursePlayerPage = () => {
   
   // Загрузка начальных данных при монтировании компонента
   useEffect(() => {
-    const loadInitialData = async () => {
-      setIsLoading(true);
-      try {
-        // Получаем данные пользователя и курсов параллельно
-        const userData = await fetchUserData();
-        const courses = await fetchCourses();
-        
-        // Если courseId не предоставлен, используем первый курс
-        const activeCourseId = courseId || (courses && courses.length > 0 ? courses[0].id : null);
-        
-        if (activeCourseId) {
-          // Получаем данные курса
-          await fetchCourseData(activeCourseId);
-          
-          // Если lessonId не предоставлен, используем первый урок
-          const activeLessonId = lessonId || "1";
-          
-          if (activeLessonId) {
-            await fetchLessonData(activeCourseId, activeLessonId);
-            // Получаем комментарии для урока
-            await fetchComments(activeCourseId, activeLessonId);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading initial data:", error);
-        setError("Ошибка при загрузке данных");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadInitialData();
-  }, []);
-  
-  // Обновление данных при изменении courseId или lessonId
-  useEffect(() => {
-    if (courseId && lessonId) {
-      const updateData = async () => {
-        setIsLoading(true);
-        try {
-          await fetchCourseData(courseId);
-          await fetchLessonData(courseId, lessonId);
-          await fetchComments(courseId, lessonId);
-        } catch (error) {
-          console.error("Error updating data:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      
-      updateData();
-    }
+    loadCourseData();
   }, [courseId, lessonId]);
   
   // Получение фото пользователя при активации раздела сертификата
   useEffect(() => {
     if (activeSection === "cert") {
-      fetchUserPhoto();
+      setUserPhoto("/api/placeholder/150/150");
     }
   }, [activeSection]);
   
   // Отслеживание и обновление прогресса пользователя
   const updateUserProgress = async (progressData) => {
     try {
-      // Отправляем запрос на обновление прогресса урока в API
-      const response = await coursesAPI.updateLessonProgress(lessonId, progressData);
+      const response = await coursesAPI.updateLessonProgress(courseId, lessonId, progressData);
       
-      // Обновляем локальное состояние с новым XP, если оно предоставлено
+      setCurrentLesson(prevLesson => {
+        const newProgress = { ...prevLesson.progress };
+        
+        if (progressData.section === "intro" && progressData.completed) {
+          newProgress.intro_completed = true;
+          newProgress.earned_xp += progressData.xp || 10;
+        }
+        
+        if (progressData.section === "video" && progressData.completed) {
+          newProgress.video_completed = true;
+          newProgress.earned_xp += progressData.xp || 15;
+        }
+        
+        if (progressData.section === "practice" && progressData.completed) {
+          newProgress.practice_completed = true;
+          newProgress.earned_xp += progressData.xp || 25;
+        }
+        
+        if (progressData.section === "test" && progressData.completed) {
+          newProgress.test_completed = true;
+          newProgress.earned_xp += progressData.xp || 50;
+        }
+        
+        if (newProgress.intro_completed && 
+            newProgress.video_completed && 
+            newProgress.practice_completed && 
+            newProgress.test_completed) {
+          newProgress.completed = true;
+        }
+        
+        return {
+          ...prevLesson,
+          progress: newProgress
+        };
+      });
+      
       if (progressData.xp) {
-        setXp(current => current + progressData.xp);
+        setXp(prevXp => prevXp + progressData.xp);
         updateProgress();
       }
       
-      // Если курс завершен, обновляем статус
-      if (progressData.section === "course" && progressData.completed) {
-        // Отправляем запрос на обновление прогресса курса
-        await coursesAPI.updateProgress(courseId, 100, "completed");
-      }
-      
-      return response;
+      return { success: true };
     } catch (error) {
       console.error("Error updating progress:", error);
-      // Обновляем локальный прогресс даже при ошибке API
-      if (progressData.xp) {
-        setXp(current => current + progressData.xp);
-        updateProgress();
-      }
+      return { success: false, error: error.message };
     }
   };
   
@@ -328,7 +245,6 @@ const CoursePlayerPage = () => {
     if (currentStep === 1) {
       setActiveSection("video");
       setCurrentStep(2);
-      // Обновление прогресса при завершении введения
       updateUserProgress({ 
         section: "intro", 
         completed: true,
@@ -337,7 +253,6 @@ const CoursePlayerPage = () => {
     } else if (currentStep === 2) {
       setActiveSection("practice");
       setCurrentStep(3);
-      // Обновление прогресса при завершении видео
       updateUserProgress({ 
         section: "video", 
         completed: true,
@@ -346,11 +261,9 @@ const CoursePlayerPage = () => {
     } else if (currentStep === 3) {
       setActiveSection("test");
       setCurrentStep(4);
-      // XP за практику уже добавлены при проверке кода
     } else if (currentStep === 4) {
       setActiveSection("cert");
       setCurrentStep(5);
-      // Обновление прогресса при завершении курса
       updateUserProgress({ 
         section: "course", 
         completed: true,
@@ -372,28 +285,21 @@ const CoursePlayerPage = () => {
   const submitCode = async () => {
     try {
       setIsLoading(true);
-      
-      // Отправляем код в API для проверки
       const response = await coursesAPI.checkCode(lessonId, codeValue);
       
-      if (response.data && response.data.success) {
-        setFeedback({
-          success: true,
-          message: response.data.message || "Отлично! Код прошел проверку."
-        });
-        
-        // Обновление прогресса и XP
+      setFeedback({
+        success: response.data.success,
+        message: response.data.message
+      });
+      
+      if (response.data.success) {
         updateUserProgress({ 
           section: "practice", 
           completed: true,
           xp: 75 
         });
-      } else {
-        setFeedback({
-          success: false,
-          message: response.data?.message || "В вашем коде есть ошибки. Пожалуйста, проверьте его и попробуйте снова."
-        });
       }
+      
     } catch (error) {
       console.error("Error submitting code:", error);
       setFeedback({
@@ -411,24 +317,19 @@ const CoursePlayerPage = () => {
     
     try {
       setIsLoading(true);
+      const response = await coursesAPI.submitTest(lessonId, testAnswers);
       
-      // Отправляем ответы на тест в API
-      const response = await coursesAPI.submitTest(lessonId, { answers: testAnswers });
+      setTestScore(response.data.score);
+      setTestSubmitted(true);
       
-      if (response.data) {
-        setTestScore(response.data.score);
-        setTestSubmitted(true);
-        
-        // Если тест пройден
-        if (response.data.passed) {
-          // Обновление прогресса и XP
-          updateUserProgress({ 
-            section: "test", 
-            completed: true,
-            xp: 100 
-          });
-        }
+      if (response.data.passed) {
+        updateUserProgress({ 
+          section: "test", 
+          completed: true,
+          xp: 100 
+        });
       }
+      
     } catch (error) {
       console.error("Error submitting test:", error);
       alert("Произошла ошибка при проверке теста.");
@@ -449,35 +350,18 @@ const CoursePlayerPage = () => {
   const handleLike = async () => {
     try {
       if (!liked) {
-        // Отправляем запрос на лайк урока в API
-        const response = await coursesAPI.likeLesson(lessonId);
-        
-        if (response.data) {
-          setLikeCount(response.data.likes_count);
-          setDislikeCount(response.data.dislikes_count);
-        } else {
-          setLikeCount(likeCount + 1);
-        }
-        
+        await coursesAPI.likeLesson(lessonId);
+        setLikeCount(likeCount + 1);
         setLiked(true);
         
         if (disliked) {
+          await coursesAPI.removeReaction(lessonId);
           setDisliked(false);
-          if (!response.data) {
-            setDislikeCount(dislikeCount - 1);
-          }
+          setDislikeCount(dislikeCount - 1);
         }
       } else {
-        // Отправляем запрос на удаление реакции в API
-        const response = await coursesAPI.removeReaction(lessonId);
-        
-        if (response.data) {
-          setLikeCount(response.data.likes_count);
-          setDislikeCount(response.data.dislikes_count);
-        } else {
-          setLikeCount(likeCount - 1);
-        }
-        
+        await coursesAPI.removeReaction(lessonId);
+        setLikeCount(likeCount - 1);
         setLiked(false);
       }
     } catch (error) {
@@ -488,35 +372,18 @@ const CoursePlayerPage = () => {
   const handleDislike = async () => {
     try {
       if (!disliked) {
-        // Отправляем запрос на дизлайк урока в API
-        const response = await coursesAPI.dislikeLesson(lessonId);
-        
-        if (response.data) {
-          setLikeCount(response.data.likes_count);
-          setDislikeCount(response.data.dislikes_count);
-        } else {
-          setDislikeCount(dislikeCount + 1);
-        }
-        
+        await coursesAPI.dislikeLesson(lessonId);
+        setDislikeCount(dislikeCount + 1);
         setDisliked(true);
         
         if (liked) {
+          await coursesAPI.removeReaction(lessonId);
           setLiked(false);
-          if (!response.data) {
-            setLikeCount(likeCount - 1);
-          }
+          setLikeCount(likeCount - 1);
         }
       } else {
-        // Отправляем запрос на удаление реакции в API
-        const response = await coursesAPI.removeReaction(lessonId);
-        
-        if (response.data) {
-          setLikeCount(response.data.likes_count);
-          setDislikeCount(response.data.dislikes_count);
-        } else {
-          setDislikeCount(dislikeCount - 1);
-        }
-        
+        await coursesAPI.removeReaction(lessonId);
+        setDislikeCount(dislikeCount - 1);
         setDisliked(false);
       }
     } catch (error) {
@@ -528,31 +395,8 @@ const CoursePlayerPage = () => {
   const handleAddComment = async () => {
     if (commentText.trim()) {
       try {
-        // Отправляем комментарий в API
-        const response = await coursesAPI.addComment(lessonId, { 
-          text: commentText,
-          parent_id: null
-        });
-        
-        if (response.data) {
-          // Добавляем новый комментарий в список
-          setComments([response.data, ...comments]);
-        } else {
-          // Если API не вернуло данные, используем локальную заглушку
-          const newComment = {
-            id: Date.now(),
-            user: {
-              id: userData?.id || 0,
-              nickname: userData?.nickname || "Вы"
-            },
-            text: commentText,
-            likes_count: 0,
-            created_at: new Date().toISOString()
-          };
-          
-          setComments([newComment, ...comments]);
-        }
-        
+        const response = await coursesAPI.addComment(lessonId, { text: commentText });
+        setComments([response.data, ...comments]);
         setCommentText("");
       } catch (error) {
         console.error("Error adding comment:", error);
@@ -563,11 +407,11 @@ const CoursePlayerPage = () => {
   
   // Функции навигации
   const changeCourse = (newCourseId) => {
-    navigate(`/course/${newCourseId}/lesson/1`);
+    navigate(`/course/${newCourseId}/lesson/1.1`);
   };
   
   const goToLesson = (moduleId, lessonId) => {
-    navigate(`/course/${courseId}/lesson/${lessonId}`);
+    navigate(`/course/${courseId}/lesson/${moduleId}.${lessonId}`);
     setMenuOpen(false);
   };
   
@@ -578,23 +422,17 @@ const CoursePlayerPage = () => {
     
     if (!certificateElement || !footerElement) return;
     
-    // Сохраняем исходное состояние видимости футера
     const originalDisplay = footerElement.style.display;
-    
-    // Временно скрываем футер с кнопками
     footerElement.style.display = 'none';
     
-    // Создаем изображение сертификата без кнопок
     html2canvas(certificateElement, {
       scale: 2,
       useCORS: true,
       logging: false,
       allowTaint: false
     }).then(canvas => {
-      // Возвращаем футер в исходное состояние
       footerElement.style.display = originalDisplay;
       
-      // Создаем PDF из изображения
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
       const pdf = new jsPDF('landscape', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -605,7 +443,6 @@ const CoursePlayerPage = () => {
     });
   };
   
-  // Показываем загрузку, если данные загружаются
   if (isLoading && !currentCourse) {
     return (
       <div className="loading-container">
@@ -614,7 +451,6 @@ const CoursePlayerPage = () => {
     );
   }
   
-  // Показываем ошибку, если произошла ошибка
   if (error && !currentCourse) {
     return (
       <div className="error-container">
@@ -631,12 +467,8 @@ const CoursePlayerPage = () => {
   
   return (
     <div className="course-player-page">
-      {/* Хедер */}
       <Header />
-
-      {/* Основной контент */}
       <div className="player-content">
-        {/* Боковая панель */}
         <aside className={`player-sidebar ${menuOpen ? "sidebar-open" : ""}`}>
           <div className="course-info">
             <h2 className="course-title">{currentCourse?.title || "Загрузка..."}</h2>
@@ -649,8 +481,6 @@ const CoursePlayerPage = () => {
                 <div className="xp-fill" style={{width: `${progress}%`}}></div>
               </div>
             </div>
-            
-            {/* Селектор курса */}
             <div className="course-selector">
               <label htmlFor="coursePicker">Выбрать курс:</label>
               <select 
@@ -659,7 +489,7 @@ const CoursePlayerPage = () => {
                 onChange={(e) => changeCourse(e.target.value)}
                 className="course-select"
               >
-                {availableCourses.map(course => (
+                {allCourses.map(course => (
                   <option key={course.id} value={course.id}>
                     {course.title}
                   </option>
@@ -669,34 +499,40 @@ const CoursePlayerPage = () => {
           </div>
           
           <div className="course-navigation">
-            {courseModules.map(module => (
+            {courseModules.map((module, moduleIndex) => (
               <div key={module.id} className="course-module">
                 <div className="module-header">
-                  <div className="module-number">{module.id}</div>
+                  <div className="module-number">{moduleIndex + 1}</div>
                   <div className="module-title">{module.title}</div>
                 </div>
                 <ul className="lesson-list">
-                  {module.lessons && module.lessons.map(lesson => (
-                    <li
-                      key={lesson.id}
-                      className={`lesson-item ${lesson.current ? 'current' : ''} ${lesson.completed ? 'completed' : ''}`}
-                    >
-                      <a 
-                        className="lesson-link"
-                        onClick={() => goToLesson(module.id, lesson.id)}
+                  {module.lessons && module.lessons.map((lesson, lessonIndex) => {
+                    const lessonIdentifier = `${moduleIndex + 1}.${lessonIndex + 1}`;
+                    const isCurrentLesson = lessonId === lessonIdentifier;
+                    
+                    return (
+                      <li
+                        key={lesson.id}
+                        className={`lesson-item ${isCurrentLesson ? 'current' : ''} ${
+                          lesson.progress?.completed ? 'completed' : ''
+                        }`}
                       >
-                        <span className="lesson-title">{lesson.title}</span>
-                        {lesson.completed && <Check size={16} className="lesson-completed-icon" />}
-                      </a>
-                    </li>
-                  ))}
+                        <a 
+                          className="lesson-link"
+                          onClick={() => goToLesson(moduleIndex + 1, lessonIndex + 1)}
+                        >
+                          <span className="lesson-title">{lesson.title}</span>
+                          {lesson.progress?.completed && <Check size={16} className="lesson-completed-icon" />}
+                        </a>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}
           </div>
         </aside>
 
-        {/* Основное содержимое урока */}
         <main className="lesson-main">
           <div className="top-progress-bar">
             <div className="progress-fill" style={{width: `${progress}%`}}></div>
@@ -750,9 +586,6 @@ const CoursePlayerPage = () => {
           </div>
           
           <div className="section-content">
-            {/* Содержимое в зависимости от активной секции */}
-            
-            {/* Введение */}
             {activeSection === "intro" && currentLesson?.intro && (
               <div className="intro-section">
                 <h2 className="lesson-title">{currentLesson.intro.title}</h2>
@@ -768,7 +601,6 @@ const CoursePlayerPage = () => {
               </div>
             )}
 
-            {/* Видео */}
             {activeSection === "video" && (
               <div className="video-section">
                 <h2 className="lesson-title">Видеоурок</h2>
@@ -800,7 +632,6 @@ const CoursePlayerPage = () => {
               </div>
             )}
             
-            {/* Практика */}
             {activeSection === "practice" && currentLesson?.practice && (
               <div className="practice-section">
                 <h2 className="lesson-title">Практическое задание</h2>
@@ -819,15 +650,15 @@ const CoursePlayerPage = () => {
                 </div>
                 
                 {feedback && (
-                  <div className={`feedback ${feedback.success ? 'success' : 'error'}`}>
+                  <div className={`feedback-message ${feedback.success ? 'success' : 'error'}`}>
                     {feedback.success ? <Check size={20} /> : <XCircle size={20} />}
                     <p>{feedback.message}</p>
                   </div>
                 )}
                 
                 <div className="lesson-actions">
-                  <button className="btn-primary" onClick={submitCode}>
-                    Проверить код
+                  <button className="btn-primary" onClick={submitCode} disabled={isLoading}>
+                    {isLoading ? "Проверка..." : "Проверить код"}
                   </button>
                   {feedback && feedback.success && (
                     <button className="btn-secondary" onClick={goToNextStep}>
@@ -838,7 +669,6 @@ const CoursePlayerPage = () => {
               </div>
             )}
             
-            {/* Тест */}
             {activeSection === "test" && currentLesson?.test && (
               <div className="test-section">
                 <h2 className="lesson-title">Проверьте свои знания</h2>
@@ -870,9 +700,9 @@ const CoursePlayerPage = () => {
                         className="btn-primary"
                         onClick={completeTestSection}
                         disabled={Object.keys(testAnswers).length < (currentLesson.test?.length || 0) || 
-                                 Object.values(testAnswers).some(val => !val)}
+                                 Object.values(testAnswers).some(val => !val) || isLoading}
                       >
-                        Проверить результаты
+                        {isLoading ? "Проверка..." : "Проверить результаты"}
                       </button>
                     </div>
                   </div>
@@ -914,7 +744,6 @@ const CoursePlayerPage = () => {
               </div>
             )}
             
-            {/* Сертификация */}
             {activeSection === "cert" && (
               <div className="cert-section">
                 <div className="certificate" id="certificate-container">
@@ -936,7 +765,7 @@ const CoursePlayerPage = () => {
                       )}
                     </div>
                     <p className="cert-text">Этот сертификат подтверждает, что</p>
-                    <p className="cert-name">{userData?.nickname || "Ученик"}</p>
+                    <p className="cert-name">{userData?.nickname || localStorage.getItem('userNickname') || "Ученик"}</p>
                     <p className="cert-text">успешно завершил курс</p>
                     <p className="cert-course">{currentCourse?.title || "Курс программирования"}</p>
                     <p className="cert-date">Дата выдачи: {new Date().toLocaleDateString()}</p>
@@ -959,8 +788,8 @@ const CoursePlayerPage = () => {
                     <p>Рекомендуем вам пройти следующие курсы для развития ваших навыков:</p>
                     
                     <div className="course-recommendations">
-                      {availableCourses
-                        .filter(course => course.id !== parseInt(courseId))
+                      {allCourses
+                        .filter(course => course.id !== courseId)
                         .slice(0, 3)
                         .map(course => (
                           <div key={course.id} className="recommended-course">
@@ -979,7 +808,6 @@ const CoursePlayerPage = () => {
               </div>
             )}
             
-            {/* Комментарии */}
             <div className="comments-section">
               <h3>
                 <MessageSquare size={20} />
@@ -997,7 +825,8 @@ const CoursePlayerPage = () => {
                       placeholder="Оставьте комментарий или задайте вопрос..."
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
-                    ></textarea>
+                    >
+                    </textarea>
                     <div className="comment-submit">
                       <button 
                         className="submit-button"
@@ -1049,7 +878,6 @@ const CoursePlayerPage = () => {
               </div>
             </div>
             
-            {/* Рейтинг урока */}
             <div className="engagement-section">
               <h3>Оцените урок</h3>
               <div className="rating-buttons">
@@ -1061,7 +889,7 @@ const CoursePlayerPage = () => {
                   <span>{likeCount}</span>
                 </button>
                 <button 
-                  className={`rating-btn ${disliked ? 'active' : ''}`}
+                  className="rating-btn ${disliked ? 'active' : ''}"
                   onClick={handleDislike}
                 >
                   <ThumbsDown size={20} />
