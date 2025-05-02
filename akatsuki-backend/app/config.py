@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True  # В продакшне установить False
     
     # Настройки базы данных
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:0000@localhost:5432/akatsuki")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:aldik07bak@localhost:5432/akatsuki")
     
     # Настройки JWT
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")

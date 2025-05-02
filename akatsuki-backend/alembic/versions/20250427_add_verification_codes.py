@@ -1,7 +1,7 @@
 """add_verification_codes
 
 Revision ID: 20250427_add_verification
-Revises: 
+Revises: 20250426_create_users
 Create Date: 2025-04-27 12:00:00.000000
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '20250427_add_verification'
-down_revision = None
+down_revision = '20250426_create_users'
 branch_labels = None
 depends_on = None
 
