@@ -42,27 +42,32 @@ api.interceptors.response.use(
 export const authAPI = {
   // Login using OAuth2 password flow
   login: async (credentials) => {
-    const formData = new URLSearchParams();
-    formData.append('username', credentials.email);
-    formData.append('password', credentials.password);
-    
-    const response = await api.post('/auth/login', formData.toString(), {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
-    
-    if (response.data && response.data.access_token) {
-      localStorage.setItem('authToken', response.data.access_token);
-      localStorage.setItem('isAuthenticated', 'true');
+    try {
+      const formData = new URLSearchParams();
+      formData.append('username', credentials.email);
+      formData.append('password', credentials.password);
       
-      if (response.data.user) {
-        localStorage.setItem('userNickname', response.data.user.nickname);
-        localStorage.setItem('userId', response.data.user.id);
+      const response = await api.post('/auth/login', formData.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+      
+      if (response.data && response.data.access_token) {
+        localStorage.setItem('authToken', response.data.access_token);
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        if (response.data.user) {
+          localStorage.setItem('userNickname', response.data.user.nickname);
+          localStorage.setItem('userId', response.data.user.id);
+        }
       }
+      
+      return response;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
     }
-    
-    return response;
   },
   
   // User registration
@@ -86,6 +91,17 @@ export const authAPI = {
   
   // Get current user info
   getCurrentUser: () => api.get('/auth/me'),
+  
+  // Set authentication token
+  setAuthToken: (token) => {
+    if (token) {
+      localStorage.setItem('authToken', token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+      localStorage.removeItem('authToken');
+      delete api.defaults.headers.common['Authorization'];
+    }
+  }
 };
 
 // Course-related API
@@ -105,6 +121,7 @@ export const coursesAPI = {
   // Update course progress
   updateCourseProgress: (courseId, progress, status) => 
     api.put(`/api/courses/${courseId}/progress`, { progress, status }),
+    
   // Get user's enrolled courses
   getUserCourses: (id) => api.get(`/api/courses/my-courses/${id}`),
   

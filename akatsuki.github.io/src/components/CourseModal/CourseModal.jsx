@@ -10,20 +10,20 @@ import hardIcon from '../../assets/images/hard-icon.svg';
 
 // Получение иконки сложности
 const getDifficultyIcon = (difficulty) => {
-  switch(difficulty) {
-    case 'Easy': return easyIcon;
-    case 'Medium': return mediumIcon;
-    case 'Hard': return hardIcon;
+  switch(difficulty?.toLowerCase()) {
+    case 'easy': return easyIcon;
+    case 'medium': return mediumIcon;
+    case 'hard': return hardIcon;
     default: return easyIcon;
   }
 };
 
 // Получение цвета для сложности
 const getDifficultyColor = (difficulty) => {
-  switch(difficulty) {
-    case 'Easy': return 'green';
-    case 'Medium': return 'orange';
-    case 'Hard': return 'red';
+  switch(difficulty?.toLowerCase()) {
+    case 'easy': return 'green';
+    case 'medium': return 'orange';
+    case 'hard': return 'red';
     default: return 'green';
   }
 };
@@ -42,11 +42,12 @@ const CourseModal = ({ isOpen, onClose, courseId = null, languageName = null, on
       setLoading(true);
       try {
         const response = await coursesAPI.getAllCourses();
-        setCourses(response.data); // Предполагаем, что данные приходят в response.data
+        console.log("Полученные курсы:", response.data);
+        setCourses(response.data || []);
         setError(null);
       } catch (err) {
-        setError('Не удалось загрузить курсы. Попробуйте позже.');
         console.error('Error fetching courses:', err);
+        setError('Не удалось загрузить курсы. Попробуйте позже.');
       } finally {
         setLoading(false);
       }
@@ -59,10 +60,11 @@ const CourseModal = ({ isOpen, onClose, courseId = null, languageName = null, on
     if (languageName) {
       // Если указан язык, фильтруем курсы по нему
       const filtered = courses.filter(course => 
-        course.languages && course.languages.some(lang => 
-          lang.toLowerCase() === languageName.toLowerCase() ||
-          (languageName === 'HTML & CSS' && (lang === 'HTML' || lang === 'CSS'))
-        )
+        course.title.toLowerCase().includes(languageName.toLowerCase()) || 
+        (languageName === 'HTML & CSS' && (
+          course.title.toLowerCase().includes('html') || 
+          course.title.toLowerCase().includes('css')
+        ))
       );
       setFilteredCourses(filtered);
       
@@ -91,37 +93,9 @@ const CourseModal = ({ isOpen, onClose, courseId = null, languageName = null, on
       try {
         await coursesAPI.enrollInCourse(selectedCourse.id);
         onClose(); // Закрываем модалку
-
-        // Получаем язык программирования из выбранного курса
-        const programmingLanguage = selectedCourse.languages && selectedCourse.languages[0] ? 
-          selectedCourse.languages[0].toLowerCase() : 'javascript';
         
-        // Определяем соответствующий идентификатор языка для CoursePlayerPage
-        let languageId;
-        switch(programmingLanguage.toLowerCase()) {
-          case 'python':
-            languageId = 'python';
-            break;
-          case 'c#':
-            languageId = 'csharp';
-            break;
-          case 'c++':
-            languageId = 'cpp';
-            break;
-          case 'react':
-            languageId = 'react';
-            break;
-          case 'html':
-          case 'css':
-            languageId = 'htmlcss';
-            break;
-          case 'javascript':
-          default:
-            languageId = 'javascript';
-        }
-        
-        // Переходим на страницу курса с соответствующим языком
-        navigate(`/course/${languageId}/lesson/1.1`);
+        // Переходим на страницу курса
+        navigate(`/course/${selectedCourse.id}/lesson/1.1`);
       } catch (err) {
         console.error('Error enrolling in course:', err);
         setError('Не удалось записаться на курс. Попробуйте позже.');
@@ -165,13 +139,13 @@ const CourseModal = ({ isOpen, onClose, courseId = null, languageName = null, on
                   onClick={() => setSelectedCourse(course)}
                 >
                   <div className="course-card-image-container">
-                    <img src={course.image} alt={course.title} className="course-card-image" />
+                    <img src="/api/placeholder/400/320" alt={course.title} className="course-card-image" />
                   </div>
                   <div className="course-card-content">
                     <h3 className="course-card-title">{course.title}</h3>
-                    <p className="course-card-provider">{course.provider}</p>
-                    <div className="course-card-difficulty" style={{ color: getDifficultyColor(course.difficulty) }}>
-                      <img src={getDifficultyIcon(course.difficulty)} alt={`${course.difficulty} difficulty`} className="difficulty-icon" />
+                    <p className="course-card-provider">Akatsuki Courses</p>
+                    <div className="course-card-difficulty" style={{ color: getDifficultyColor(course.difficulty || 'easy') }}>
+                      <img src={getDifficultyIcon(course.difficulty || 'easy')} alt={`${course.difficulty || 'easy'} difficulty`} className="difficulty-icon" />
                     </div>
                   </div>
                 </div>
@@ -182,25 +156,25 @@ const CourseModal = ({ isOpen, onClose, courseId = null, languageName = null, on
               <div className="course-modal-content">
                 <div className="course-header">
                   <div className="course-image-container">
-                    <img src={selectedCourse.image} alt={selectedCourse.title} className="course-image" />
+                    <img src="/api/placeholder/260/180" alt={selectedCourse.title} className="course-image" />
                   </div>
                   
                   <div className="course-title-section">
                     <h2 className="course-title">{selectedCourse.title}</h2>
-                    <p className="course-provider">{selectedCourse.provider}</p>
+                    <p className="course-provider">Akatsuki Courses</p>
                     
-                    <div className="course-difficulty" style={{ color: getDifficultyColor(selectedCourse.difficulty) }}>
-                      <img src={getDifficultyIcon(selectedCourse.difficulty)} alt={`${selectedCourse.difficulty} difficulty`} className="difficulty-icon" />
+                    <div className="course-difficulty" style={{ color: getDifficultyColor(selectedCourse.difficulty || 'easy') }}>
+                      <img src={getDifficultyIcon(selectedCourse.difficulty || 'easy')} alt={`${selectedCourse.difficulty || 'easy'} difficulty`} className="difficulty-icon" />
                     </div>
                     
                     <div className="course-category">
                       <span>Категория:</span>
-                      <span>{selectedCourse.category}</span>
+                      <span>{selectedCourse.category || 'Программирование'}</span>
                     </div>
                     
                     <div className="course-xp">
                       <span>За завершение:</span>
-                      <span>{selectedCourse.xp} XP</span>
+                      <span>{selectedCourse.xp_reward || 100} XP</span>
                     </div>
                   </div>
                 </div>
@@ -208,48 +182,33 @@ const CourseModal = ({ isOpen, onClose, courseId = null, languageName = null, on
                 <div className='course-instructors'>
                   <h3>Инструкторы:</h3>
                   <div className="instructors-list">
-                    {Array.isArray(selectedCourse.teacher) ? 
-                      selectedCourse.teacher.map((teacher, index) => (
-                        <div key={index} className="instructor-item">
-                          <div className="instructor-avatar">
-                            {teacher.avatar ? 
-                              <img src={teacher.avatar} alt={teacher.name} /> :
-                              <div className="avatar-placeholder">{teacher.name.charAt(0)}</div>
-                            }
-                          </div>
-                          <span className="instructor-name">{teacher.name}</span>
-                        </div>
-                      )) : 
-                      <div className="instructor-item">
-                        <div className="instructor-avatar">
-                          <div className="avatar-placeholder">
-                            {selectedCourse.teacher ? selectedCourse.teacher.charAt(0) : "?"}
-                          </div>
-                        </div>
-                        <span className="instructor-name">{selectedCourse.teacher || "Неизвестный инструктор"}</span>
+                    <div className="instructor-item">
+                      <div className="instructor-avatar">
+                        <div className="avatar-placeholder">A</div>
                       </div>
-                    }
+                      <span className="instructor-name">Алдияр</span>
+                    </div>
                   </div>
                 </div>
                 
                 <div className="course-details">
                   <div className="course-description">
                     <h3>Описание курса</h3>
-                    <p>{selectedCourse.description}</p>
+                    <p>{selectedCourse.description || 'Курс по программированию от Akatsuki Courses'}</p>
                   </div>
                   
                   <div className="course-skills">
                     <h3>Навыки, которые вы приобретете</h3>
                     <ul>
-                      {selectedCourse.skills && selectedCourse.skills.map((skill, index) => (
-                        <li key={index}>{skill}</li>
-                      ))}
+                      <li>Основы программирования</li>
+                      <li>Работа с данными</li>
+                      <li>Создание приложений</li>
                     </ul>
                   </div>
                   
                   <div className="course-duration">
                     <h3>Продолжительность</h3>
-                    <p>{selectedCourse.duration}</p>
+                    <p>{selectedCourse.duration || '10 часов'}</p>
                   </div>
                 </div>
                 
@@ -294,7 +253,8 @@ export const CourseGrid = ({ onCourseClick }) => {
       setLoading(true);
       try {
         const response = await coursesAPI.getAllCourses();
-        setCourses(response.data); // Предполагаем, что данные приходят в response.data
+        console.log("Курсы для сетки:", response.data);
+        setCourses(response.data || []);
         setError(null);
       } catch (err) {
         setError('Не удалось загрузить курсы. Попробуйте позже.');
@@ -309,36 +269,8 @@ export const CourseGrid = ({ onCourseClick }) => {
   const handleCourseClick = async (course) => {
     try {
       await coursesAPI.enrollInCourse(course.id);
-      // Получаем язык программирования из курса
-      const programmingLanguage = course.languages && course.languages[0] ? 
-        course.languages[0].toLowerCase() : 'javascript';
-      
-      // Определяем соответствующий идентификатор языка
-      let languageId;
-      switch(programmingLanguage.toLowerCase()) {
-        case 'python':
-          languageId = 'python';
-          break;
-        case 'c#':
-          languageId = 'csharp';
-          break;
-        case 'c++':
-          languageId = 'cpp';
-          break;
-        case 'react':
-          languageId = 'react';
-          break;
-        case 'html':
-        case 'css':
-          languageId = 'htmlcss';
-          break;
-        case 'javascript':
-        default:
-          languageId = 'javascript';
-      }
-      
-      // Переходим на страницу курса с соответствующим языком
-      navigate(`/course/${languageId}/lesson/1.1`);
+      // Переходим на страницу курса
+      navigate(`/course/${course.id}/lesson/1.1`);
     } catch (err) {
       console.error('Error enrolling in course:', err);
       setError('Не удалось записаться на курс. Попробуйте позже.');
@@ -359,34 +291,40 @@ export const CourseGrid = ({ onCourseClick }) => {
         </div>
       )}
       
-      {!loading && !error && courses.map(course => (
-        <div 
-          key={course.id}
-          className="course-card"
-          onClick={() => onCourseClick(course.id)}
-        >
-          <div className="course-card-image-container">
-            <img src={course.image} alt={course.title} className="course-card-image" />
+      {!loading && !error && courses.length > 0 ? (
+        courses.map(course => (
+          <div 
+            key={course.id}
+            className="course-card"
+            onClick={() => onCourseClick(course.id)}
+          >
+            <div className="course-card-image-container">
+              <img src="/api/placeholder/400/320" alt={course.title} className="course-card-image" />
+            </div>
+            <div className="course-card-content">
+              <h3 className="course-card-title">{course.title}</h3>
+              <p className="course-card-provider">Akatsuki Courses</p>
+              <div className="course-card-difficulty" style={{ color: getDifficultyColor(course.difficulty || 'easy') }}>
+                <img src={getDifficultyIcon(course.difficulty || 'easy')} alt={`${course.difficulty || 'easy'} difficulty`} className="difficulty-icon" />
+              </div>
+              <div className="course-card-category">
+                Категория: {course.category || 'Программирование'}
+              </div>
+              <div className="course-card-xp">
+                За завершение: {course.xp_reward || 100} XP
+              </div>
+              <button className="learn-button" onClick={(e) => {
+                e.stopPropagation();
+                handleCourseClick(course);
+              }}>Изучить Технику</button>
+            </div>
           </div>
-          <div className="course-card-content">
-            <h3 className="course-card-title">{course.title}</h3>
-            <p className="course-card-provider">{course.provider}</p>
-            <div className="course-card-difficulty" style={{ color: getDifficultyColor(course.difficulty) }}>
-              <img src={getDifficultyIcon(course.difficulty)} alt={`${course.difficulty} difficulty`} className="difficulty-icon" />
-            </div>
-            <div className="course-card-category">
-              Категория: {course.category}
-            </div>
-            <div className="course-card-xp">
-              За завершение: {course.xp} XP
-            </div>
-            <button className="learn-button" onClick={(e) => {
-              e.stopPropagation();
-              handleCourseClick(course);
-            }}>Изучить Технику</button>
-          </div>
+        ))
+      ) : !loading && !error && (
+        <div className="no-courses-message">
+          <p>В данный момент нет доступных курсов. Проверьте позже.</p>
         </div>
-      ))}
+      )}
     </div>
   );
 };
