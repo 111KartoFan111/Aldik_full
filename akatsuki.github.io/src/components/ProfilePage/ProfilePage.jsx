@@ -28,36 +28,40 @@ const ProfilePage = () => {
   const [error, setError] = useState(null);
 
   // Функция для загрузки аватара
-const handleAvatarUpload = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-  
-  setLoading(true);
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
+  const handleAvatarUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
     
-    const response = await profileAPI.uploadAvatar(formData);
-    
-    if (response.data && response.data.avatar_url) {
-      setUserData(prevData => ({
-        ...prevData,
-        avatar_url: response.data.avatar_url
-      }));
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
       
-      // Обновить аватар в localStorage для других страниц
-      localStorage.setItem('userAvatar', response.data.avatar_url);
+      const response = await profileAPI.uploadAvatar(formData);
       
-      // Показать сообщение об успехе
-      alert("Аватар успешно обновлен!");
+      if (response.data && response.data.avatar_url) {
+        // Создаем полный URL для аватара
+        const fullUrl = response.data.avatar_url.startsWith('http') 
+          ? response.data.avatar_url 
+          : `http://localhost:8000${response.data.avatar_url.startsWith('/') ? response.data.avatar_url : '/' + response.data.avatar_url}`;
+        
+        // Сохраняем полный URL в localStorage
+        localStorage.setItem('userAvatar', fullUrl);
+        
+        setUserData(prevData => ({
+          ...prevData,
+          avatar_url: fullUrl
+        }));
+        
+        alert("Аватар успешно обновлен!");
+      }
+    } catch (error) {
+      console.error("Ошибка при загрузке аватара:", error);
+      alert("Ошибка при загрузке аватара. Попробуйте еще раз.");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Ошибка при загрузке аватара:", error);
-    alert("Ошибка при загрузке аватара. Попробуйте еще раз.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
   
   // Функция для получения ранга на основе XP
   const getRank = (xp) => {
@@ -127,6 +131,17 @@ const handleAvatarUpload = async (event) => {
       setLoading(true);
       setError(null);
       
+      // Получаем аватар из localStorage (используем в качестве начального значения)
+      const savedAvatar = localStorage.getItem('userAvatar');
+      
+      // Если есть сохраненный аватар, инициализируем им состояние
+      if (savedAvatar) {
+        setUserData(prevData => ({
+          ...prevData,
+          avatar_url: savedAvatar
+        }));
+      }
+      
       // Получаем данные профиля
       const profileResponse = await profileAPI.getUserProfile();
       const userProfile = profileResponse.data;
@@ -144,6 +159,20 @@ const handleAvatarUpload = async (event) => {
       const rank = getRank(userProfile.xp);
       const maxXp = getMaxXP(rank);
       const nextRank = getNextRank(rank);
+      
+      // Преобразуем аватар URL в полный URL, если он существует
+      let avatarUrl = userProfile.avatar_url;
+      if (avatarUrl) {
+        avatarUrl = avatarUrl.startsWith('http') 
+          ? avatarUrl 
+          : `http://localhost:8000${avatarUrl.startsWith('/') ? avatarUrl : '/' + avatarUrl}`;
+        
+        // Обновляем сохраненный аватар
+        localStorage.setItem('userAvatar', avatarUrl);
+      } else if (savedAvatar) {
+        // Используем сохраненный аватар, если с сервера ничего не пришло
+        avatarUrl = savedAvatar;
+      }
       
       // Создаем сертификаты на основе завершенных курсов
       const certificates = userCourses
@@ -163,6 +192,7 @@ const handleAvatarUpload = async (event) => {
         xp: userProfile.xp,
         maxXp: maxXp,
         nextRank: nextRank,
+        avatar_url: avatarUrl, // Добавляем обработанный URL аватара
         courses: userCourses,
         certificates: certificates
       });
@@ -227,7 +257,7 @@ const handleAvatarUpload = async (event) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
             title="Изменить аватар"
           >
@@ -434,6 +464,11 @@ const handleAvatarUpload = async (event) => {
         return renderOverview();
     }
   };
+  const fullAvatarUrl = userData.avatar_url 
+  ? (userData.avatar_url.startsWith('http') 
+      ? userData.avatar_url 
+      : `http://localhost:8000${userData.avatar_url.startsWith('/') ? userData.avatar_url : '/' + userData.avatar_url}`)
+  : userAvatar;
   
   return (
     <div className="profile-page">

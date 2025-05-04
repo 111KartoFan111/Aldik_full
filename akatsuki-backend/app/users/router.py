@@ -172,7 +172,7 @@ async def upload_avatar(
         shutil.copyfileobj(file.file, buffer)
     
     # Обновляем URL аватара пользователя
-    avatar_url = f"/static/avatars/{filename}"
+    avatar_url = f"http://localhost:8000/static/avatars/{filename}"
     current_user.avatar_url = avatar_url
     db.add(current_user)
     db.commit()

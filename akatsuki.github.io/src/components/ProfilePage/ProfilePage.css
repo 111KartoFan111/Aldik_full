@@ -921,3 +921,20 @@
 .avatar-upload-button:hover {
   background: rgb(174, 18, 24);
 }
+
+.user-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden; /* Важно! Обрезает всё, что выходит за круг */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ключевое свойство - масштабирует и обрезает изображение */
+  object-position: center; /* Центрирует изображение */
+}
