@@ -109,6 +109,17 @@ def get_user_profile_by_id(
     
     return user_profile
 
+@router.post("/update-xp")
+def update_user_xp(
+    xp_data: dict, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    current_user.xp += xp_data["xp"]
+    db.add(current_user)
+    db.commit()
+    return {"success": True}
+
 @router.get("/leaderboard", response_model=list[dict])
 def get_leaderboard(
     limit: int = 10,

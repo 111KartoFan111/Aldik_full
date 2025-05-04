@@ -371,19 +371,19 @@ const CoursePlayerPage = () => {
         setCurrentStep(4);
       }
     } else if (currentStep === 4) {
-      // Переход от теста к сертификату
-      // При этом прогресс увеличивается до 100%
-      result = await updateUserProgress({ 
-        section: "course", 
-        completed: true,
-        xp: 500 // При завершении всего курса даем полные 500 XP
+      // Принудительно обновить статус курса
+      await coursesAPI.updateCourseProgress(courseId, {
+        progress: 100,
+        status: "completed",
+        earned_xp: 500
       });
       
-      if (result.success) {
-        setActiveSection("cert");
-        setCurrentStep(5);
-        setCourseCompleted(true);
-      }
+      // Обновить XP пользователя напрямую
+      await profileAPI.updateUserXP(500);
+      
+      setActiveSection("cert");
+      setCurrentStep(5);
+      setCourseCompleted(true);
     }
   };
   
@@ -474,26 +474,21 @@ const CoursePlayerPage = () => {
       
       // Если тест пройден, обновляем прогресс на сервере с увеличенным XP
       if (response.data.passed) {
+        // Сначала обновляем прогресс теста (сохраняем результат в переменную progressResult)
         const progressResult = await updateUserProgress({ 
           section: "test", 
           completed: true,
-          xp: 100 // Увеличенное количество XP за прохождение теста
+          xp: 100
         });
         
-        // Если все этапы курса завершены, обновляем общий прогресс курса
-        if (progressResult.success) {
-          // Проверяем, все ли этапы завершены
-          if (currentLesson?.progress?.intro_completed && 
-              currentLesson?.progress?.video_completed && 
-              currentLesson?.progress?.practice_completed) {
-            
-            // Обновляем общий прогресс курса
-            await updateUserProgress({ 
-              section: "course", 
-              completed: true,
-              xp: 500 // 500 XP за весь курс
-            });
-          }
+        // Затем проверяем успешность и обновляем статус курса
+        if (progressResult && progressResult.success) {
+          // Обновляем статус курса
+          await coursesAPI.updateCourseProgress(courseId, {
+            progress: 100,
+            status: "completed",
+            earned_xp: 500
+          });
         }
       }
       
@@ -1025,6 +1020,12 @@ const CoursePlayerPage = () => {
                     </div>
                   </div>
                 </div>
+                <button 
+                  onClick={forceUpdateProgress}
+                  style={{marginTop: "20px", padding: "10px", background: "#ff3c3c", color: "white", border: "none", borderRadius: "5px", cursor: "pointer"}}
+                >
+                  Обновить прогресс и XP
+                </button>
               </div>
             )}
             

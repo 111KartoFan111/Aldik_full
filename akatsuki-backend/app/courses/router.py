@@ -192,15 +192,15 @@ def update_course_progress(
         user_course.status = progress_data.status
         
         # Если курс завершен, устанавливаем дату завершения
-        if progress_data.status == CourseStatus.COMPLETED and not user_course.completed_at:
+        # В функции update_course_progress добавить:
+        if progress_data.status == CourseStatus.COMPLETED:
+            # Всегда устанавливать прогресс 100% при завершении
+            user_course.progress = 100
             user_course.completed_at = datetime.utcnow()
+            user_course.earned_xp = course.xp_reward
             
-            # Начисляем XP за завершение курса
-            earned_xp = course.xp_reward
-            user_course.earned_xp = earned_xp
-            
-            # Добавляем XP пользователю
-            current_user.xp += earned_xp
+            # Добавить XP пользователю
+            current_user.xp += course.xp_reward
             db.add(current_user)
     
     db.commit()
