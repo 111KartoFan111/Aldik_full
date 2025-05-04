@@ -119,8 +119,10 @@ export const coursesAPI = {
   enrollInCourse: (courseId) => api.post(`/api/courses/enroll`, { course_id: courseId }),
   
   // Update course progress
-  updateCourseProgress: (courseId, progress, status) => 
-    api.put(`/api/courses/${courseId}/progress`, { progress, status }),
+  updateCourseProgress: (courseId, progressData) => 
+    api.put(`/api/courses/${courseId}/progress`, progressData),
+
+  getCourseProgress: (courseId) => api.get(`/api/courses/${courseId}/progress`),
     
   // Get user's enrolled courses
   getUserCourses: (id) => api.get(`/api/courses/my-courses/${id}`),
@@ -145,6 +147,12 @@ export const coursesAPI = {
   // Comments
   getLessonComments: (lessonId) => api.get(`/lessons/${lessonId}/comments`),
   addComment: (lessonId, commentData) => api.post(`/lessons/${lessonId}/comments`, commentData),
+
+  // Проверка наличия сертификата
+  checkCertificate: (courseId) => api.get(`/api/courses/${courseId}/certificate`),
+
+  // Генерация сертификата
+  generateCertificate: (courseId) => api.post(`/api/courses/${courseId}/certificate`),
 };
 
 // User profile API
@@ -152,6 +160,13 @@ export const profileAPI = {
   getUserProfile: () => api.get('/users/profile'),
   getLeaderboard: (limit = 10) => api.get(`/users/leaderboard?limit=${limit}`),
   getUserById: (userId) => api.get(`/users/${userId}/profile`),
+  // Новый метод для обновления XP пользователя
+  updateUserXP: (xpAmount) => api.post('/users/update-xp', { xp: xpAmount }),
+    // Обновите метод updateCourseProgress
+  updateCourseProgress: (courseId, progressData) => 
+    api.put(`/api/courses/${courseId}/progress`, progressData),
+
+  getCourseProgress: (courseId) => api.get(`/api/courses/${courseId}/progress`),
 };
 
 export default api;

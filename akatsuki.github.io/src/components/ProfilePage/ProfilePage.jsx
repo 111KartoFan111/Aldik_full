@@ -54,6 +54,38 @@ const ProfilePage = () => {
       default: return "Чуунин";
     }
   };
+
+  const refreshCourseProgress = async () => {
+    try {
+      // Получаем ID пользователя из localStorage или состояния
+      const userId = userData.id || localStorage.getItem('userId');
+      if (!userId) return;
+      
+      // Получаем обновленный прогресс курсов
+      const coursesResponse = await coursesAPI.getUserCourses(userId);
+      const userCourses = coursesResponse.data;
+      
+      // Обновляем состояние с новым прогрессом курсов
+      setUserData(prevData => ({
+        ...prevData,
+        courses: userCourses
+      }));
+    } catch (error) {
+      console.error("Ошибка при обновлении прогресса курсов:", error);
+    }
+  };
+  
+  // Добавляем в useEffect обновление каждую минуту
+  useEffect(() => {
+    fetchUserData();
+    
+    // Устанавливаем интервал для обновления прогресса курсов
+    const progressInterval = setInterval(() => {
+      refreshCourseProgress();
+    }, 60000); // Обновление каждую минуту
+    
+    return () => clearInterval(progressInterval);
+  }, []);
   
   // Загрузка данных пользователя
   const fetchUserData = async () => {

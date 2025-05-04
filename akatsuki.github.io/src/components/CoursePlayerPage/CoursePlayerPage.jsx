@@ -243,19 +243,90 @@ const CoursePlayerPage = () => {
         }));
       }
       
-      // Если был передан XP, обновляем общий XP пользователя
-      if (progressData.xp && response.data.success) {
-        setXp(prevXp => {
-          const newXp = prevXp + progressData.xp;
-          updateProgress(newXp);
-          return newXp;
-        });
+      // Рассчитываем и обновляем прогресс курса
+      try {
+        // Пересчитываем XP в зависимости от прогресса
+        let earnedXp = progressData.xp || 0;
+        let newProgress = 0;
+        
+        // Определяем процент прохождения на основе текущего шага
+        if (currentStep === 1) {
+          newProgress = 20;
+        } else if (currentStep === 2) {
+          newProgress = 40;
+        } else if (currentStep === 3) {
+          newProgress = 60;
+        } else if (currentStep === 4) {
+          newProgress = 80;
+        } else if (currentStep === 5) {
+          newProgress = 100;
+          earnedXp = 500; // При полном завершении курса - 500 XP
+        }
+        
+        // Увеличиваем заработанный XP при выполнении серьезных этапов
+        if (progressData.section === "test" && progressData.completed) {
+          earnedXp = Math.max(earnedXp, 100); // Минимум 100 XP за тест
+        } else if (progressData.section === "course" && progressData.completed) {
+          earnedXp = 500; // 500 XP за курс
+        }
+        
+        // Важно: при завершении курса (тест пройден) обновляем общий прогресс
+        if ((progressData.section === "test" && progressData.completed) || 
+            (progressData.section === "course" && progressData.completed)) {
+          
+          // Обновляем прогресс курса на сервере
+          await coursesAPI.updateCourseProgress(courseId, {
+            progress: newProgress,
+            status: newProgress === 100 ? "completed" : "in_progress",
+            earned_xp: earnedXp
+          });
+          
+          console.log(`Обновлен прогресс курса до ${newProgress}%, начислено ${earnedXp} XP`);
+          
+          // Обновляем общий XP пользователя на сервере
+          if (earnedXp > 0) {
+            await profileAPI.updateUserXP(earnedXp);
+            
+            // Обновляем локальное состояние XP
+            setXp(prevXp => {
+              const newXp = prevXp + earnedXp;
+              updateProgress(newXp);
+              return newXp;
+            });
+          }
+        }
+        
+      } catch (error) {
+        console.error("Ошибка при обновлении прогресса курса:", error);
       }
       
       return { success: true, progress: response.data.progress };
     } catch (error) {
       console.error("Error updating progress:", error);
       return { success: false, error: error.message };
+    }
+  };
+
+  const forceUpdateProgress = async () => {
+    try {
+      // Обновляем прогресс курса до 100% и устанавливаем начисленные XP в 500
+      await coursesAPI.updateCourseProgress(courseId, {
+        progress: 100,
+        status: "completed",
+        earned_xp: 500
+      });
+      
+      // Обновляем общий XP пользователя
+      await profileAPI.updateUserXP(500);
+      
+      alert("Прогресс курса успешно обновлен до 100%, начислено 500 XP!");
+      
+      // Перезагружаем страницу для отображения обновленного прогресса
+      window.location.reload();
+      
+    } catch (error) {
+      console.error("Ошибка при принудительном обновлении прогресса:", error);
+      alert("Ошибка при обновлении прогресса: " + error.message);
     }
   };
   
@@ -288,23 +359,34 @@ const CoursePlayerPage = () => {
         setCurrentStep(3);
       }
     } else if (currentStep === 3) {
-      // Переход от практики к тесту (без доп. обновления прогресса, т.к. это уже сделал submitCode)
-      setActiveSection("test");
-      setCurrentStep(4);
-    } else if (currentStep === 4) {
-      // Переход от теста к сертификату (без доп. обновления прогресса, т.к. это уже сделал completeTestSection)
-      setActiveSection("cert");
-      setCurrentStep(5);
-      setCourseCompleted(true);
+      // Обновляем прогресс практики
+      result = await updateUserProgress({ 
+        section: "practice", 
+        completed: true,
+        xp: 50 
+      });
       
-      // Финальное обновление прогресса курса
-      await updateUserProgress({ 
+      if (result.success) {
+        setActiveSection("test");
+        setCurrentStep(4);
+      }
+    } else if (currentStep === 4) {
+      // Переход от теста к сертификату
+      // При этом прогресс увеличивается до 100%
+      result = await updateUserProgress({ 
         section: "course", 
         completed: true,
-        xp: 350 
+        xp: 500 // При завершении всего курса даем полные 500 XP
       });
+      
+      if (result.success) {
+        setActiveSection("cert");
+        setCurrentStep(5);
+        setCourseCompleted(true);
+      }
     }
   };
+  
   
   // Расчет процентов прогресса
   const updateProgress = (newXp) => {
@@ -324,12 +406,20 @@ const CoursePlayerPage = () => {
       });
       
       if (response.data.success) {
-        // Обновляем прогресс практики на сервере
+        // Обновляем прогресс практики на сервере с увеличенным XP
         const progressResult = await updateUserProgress({ 
           section: "practice", 
           completed: true,
-          xp: 75 
+          xp: 50 // Увеличенное количество XP за прохождение практики
         });
+        
+        // Если получилось обновить, переходим к следующему шагу
+        if (progressResult.success) {
+          // Даем пользователю немного времени увидеть сообщение об успехе
+          setTimeout(() => {
+            goToNextStep();
+          }, 2000);
+        }
       }
       
     } catch (error) {
@@ -382,13 +472,29 @@ const CoursePlayerPage = () => {
       setTestScore(response.data.score);
       setTestSubmitted(true);
       
-      // Если тест пройден, обновляем прогресс на сервере
+      // Если тест пройден, обновляем прогресс на сервере с увеличенным XP
       if (response.data.passed) {
         const progressResult = await updateUserProgress({ 
           section: "test", 
           completed: true,
-          xp: 100 
+          xp: 100 // Увеличенное количество XP за прохождение теста
         });
+        
+        // Если все этапы курса завершены, обновляем общий прогресс курса
+        if (progressResult.success) {
+          // Проверяем, все ли этапы завершены
+          if (currentLesson?.progress?.intro_completed && 
+              currentLesson?.progress?.video_completed && 
+              currentLesson?.progress?.practice_completed) {
+            
+            // Обновляем общий прогресс курса
+            await updateUserProgress({ 
+              section: "course", 
+              completed: true,
+              xp: 500 // 500 XP за весь курс
+            });
+          }
+        }
       }
       
     } catch (error) {
