@@ -17,6 +17,7 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     nickname = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
+    avatar_url = Column(String, nullable=True)
     xp = Column(Integer, default=0)
     is_active = Column(Boolean, default=True)  # Изменено на True по умолчанию
     is_verified = Column(Boolean, default=True)  # Изменено на True по умолчанию

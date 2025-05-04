@@ -9,8 +9,10 @@ import certificateIcon from "../../assets/images/Warning/Wavy_Check.svg";
 import courseIcon from "../../assets/images/System/Terminal.svg";
 import reviewIcon from "../../assets/images/Interface/Chart_Bar_Vertical_01.svg";
 import { profileAPI, coursesAPI, authAPI } from "../../services/api";
+import { useRef } from 'react';
 
 const ProfilePage = () => {
+  const avatarInputRef = useRef(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [userData, setUserData] = useState({
     name: "Загрузка...",
@@ -24,6 +26,38 @@ const ProfilePage = () => {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Функция для загрузки аватара
+const handleAvatarUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  setLoading(true);
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    const response = await profileAPI.uploadAvatar(formData);
+    
+    if (response.data && response.data.avatar_url) {
+      setUserData(prevData => ({
+        ...prevData,
+        avatar_url: response.data.avatar_url
+      }));
+      
+      // Обновить аватар в localStorage для других страниц
+      localStorage.setItem('userAvatar', response.data.avatar_url);
+      
+      // Показать сообщение об успехе
+      alert("Аватар успешно обновлен!");
+    }
+  } catch (error) {
+    console.error("Ошибка при загрузке аватара:", error);
+    alert("Ошибка при загрузке аватара. Попробуйте еще раз.");
+  } finally {
+    setLoading(false);
+  }
+};
   
   // Функция для получения ранга на основе XP
   const getRank = (xp) => {
@@ -164,8 +198,41 @@ const ProfilePage = () => {
   const renderOverview = () => (
     <div className="profile-overview">
       <div className="user-stats">
-        <div className="user-avatar-large">
-          <img src={userAvatar} alt="Аватар пользователя" />
+        <div className="user-avatar-large" style={{ position: 'relative' }}>
+          {userData.avatar_url ? (
+            <img src={userData.avatar_url} alt="Аватар пользователя" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <img src={userAvatar} alt="Аватар по умолчанию" />
+          )}
+          
+          <input 
+            type="file" 
+            ref={avatarInputRef}
+            style={{ display: 'none' }} 
+            accept="image/*"
+            onChange={handleAvatarUpload}
+          />
+          
+          <button 
+            onClick={() => avatarInputRef.current.click()}
+            style={{
+              position: 'absolute',
+              bottom: '5px',
+              right: '5px',
+              background: '#333',
+              border: 'none',
+              borderRadius: '50%',
+              width: '30px',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }}
+            title="Изменить аватар"
+          >
+            <span style={{ color: 'white', fontSize: '16px' }}>+</span>
+          </button>
         </div>
         <div className="user-info-large">
           <h2>{userData.name}</h2>
@@ -375,7 +442,11 @@ const ProfilePage = () => {
         <div className="sidebar">
           <div className="user-info">
             <div className="user-avatar">
-              <img src={userAvatar} alt="Аватар пользователя" />
+              {userData.avatar_url ? (
+                <img src={userData.avatar_url} alt="Аватар пользователя" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <img src={userAvatar} alt="Аватар по умолчанию" />
+              )}
             </div>
             <div className="user-details">
               <h3>{userData.name}</h3>

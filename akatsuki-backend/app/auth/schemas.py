@@ -26,6 +26,7 @@ class UserResponse(UserBase):
     is_active: bool = True
     is_verified: bool = True
     created_at: datetime
+    avatar_url: Optional[str] = None  # Поле должно быть здесь, внутри класса
 
     class Config:
         from_attributes = True

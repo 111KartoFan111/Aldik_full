@@ -167,6 +167,11 @@ export const profileAPI = {
     api.put(`/api/courses/${courseId}/progress`, progressData),
 
   getCourseProgress: (courseId) => api.get(`/api/courses/${courseId}/progress`),
+  uploadAvatar: (formData) => {
+    return api.post('/users/upload-avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
 };
 
 export default api;

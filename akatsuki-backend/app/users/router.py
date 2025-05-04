@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
 from sqlalchemy.orm import Session
 from typing import Any
 
@@ -7,6 +7,9 @@ from app.auth.jwt import get_current_user
 from app.auth.models import User
 from app.courses.models import UserCourse, Course
 from app.courses.schemas import UserProfile, UserCourseBrief
+import shutil
+import os
+from uuid import uuid4
 
 router = APIRouter(
     prefix="/users",
@@ -145,3 +148,33 @@ def get_leaderboard(
         })
     
     return result
+
+@router.post("/upload-avatar")
+async def upload_avatar(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> Any:
+    """
+    Загрузка аватара пользователя
+    """
+    # Создаем директорию для аватаров
+    avatar_dir = "static/avatars"
+    os.makedirs(avatar_dir, exist_ok=True)
+    
+    # Генерируем уникальное имя файла
+    file_extension = file.filename.split(".")[-1]
+    filename = f"{uuid4()}.{file_extension}"
+    file_path = f"{avatar_dir}/{filename}"
+    
+    # Сохраняем файл
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # Обновляем URL аватара пользователя
+    avatar_url = f"/static/avatars/{filename}"
+    current_user.avatar_url = avatar_url
+    db.add(current_user)
+    db.commit()
+    
+    return {"success": True, "avatar_url": avatar_url}

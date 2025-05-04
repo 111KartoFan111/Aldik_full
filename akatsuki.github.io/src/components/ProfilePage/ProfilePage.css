@@ -895,3 +895,29 @@
 .logout-btn a:hover::before {
   opacity: 1;
 }
+
+/* Стили для загрузки аватара */
+.user-avatar-large {
+  position: relative;
+  overflow: hidden; /* Для обрезки фото по кругу */
+}
+
+.avatar-upload-button {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: rgba(174, 18, 24, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.avatar-upload-button:hover {
+  background: rgb(174, 18, 24);
+}
