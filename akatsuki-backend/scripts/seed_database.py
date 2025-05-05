@@ -46,18 +46,6 @@ def seed_database():
                 "description": "Базовый курс по JavaScript для начинающих. Вы научитесь основам языка, работе с переменными, функциями и объектами.",
                 "duration": 180,
                 "xp_reward": 500
-            },
-            {
-                "title": "HTML и CSS для начинающих",
-                "description": "Изучите основы веб-разработки с HTML и CSS. Создайте свой первый веб-сайт с нуля!",
-                "duration": 150,
-                "xp_reward": 450
-            },
-            {
-                "title": "Python для анализа данных",
-                "description": "Научитесь использовать Python для работы с данными, включая библиотеки Pandas и NumPy.",
-                "duration": 210,
-                "xp_reward": 600
             }
         ]
         
