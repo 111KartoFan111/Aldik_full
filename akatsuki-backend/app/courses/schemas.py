@@ -13,6 +13,7 @@ class CourseBase(BaseModel):
     description: str
     duration: int
     xp_reward: int
+    image_url: Optional[str] = None  # Добавляем поле изображения
 
 class CourseCreate(CourseBase):
     pass
@@ -22,6 +23,7 @@ class CourseUpdate(CourseBase):
     description: Optional[str] = None
     duration: Optional[int] = None
     xp_reward: Optional[int] = None
+    image_url: Optional[str] = None
 
 class CourseResponse(CourseBase):
     id: int

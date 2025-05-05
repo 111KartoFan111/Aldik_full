@@ -62,6 +62,25 @@ const ProfilePage = () => {
       setLoading(false);
     }
   };
+
+  const getCourseImageUrl = (course) => {
+    // Если у курса есть image_url, используем его
+    if (course && course.course && course.course.image_url) {
+      // Если URL начинается с http, это полный URL
+      if (course.course.image_url.startsWith('http')) {
+        return course.course.image_url;
+      }
+      // Если URL начинается с /, это относительный путь от корня сервера
+      if (course.course.image_url.startsWith('/')) {
+        return `http://localhost:8000${course.course.image_url}`;
+      }
+      // Иначе, это относительный путь
+      return `http://localhost:8000/${course.course.image_url}`;
+    }
+    
+    // По умолчанию
+    return '/api/placeholder/120/90';
+  };
   
   // Функция для получения ранга на основе XP
   const getRank = (xp) => {
@@ -291,7 +310,10 @@ const ProfilePage = () => {
                 .map(course => (
                   <div className="course-card" key={course.id}>
                     <div className="course-imagee">
-                      <img src="/api/placeholder/120/90" alt={course.course?.title || "Курс"} />
+                      <img 
+                        src={getCourseImageUrl(course)} 
+                        alt={course.course?.title || "Курс"} 
+                      />
                     </div>
                     <div className="course-info">
                       <h4>{course.course?.title || "Курс"}</h4>
@@ -301,7 +323,7 @@ const ProfilePage = () => {
                         </div>
                         <span>{course.progress}%</span>
                       </div>
-                      <Link to={`/course/${course.course_id}/lesson/1`} className="continue-btn">
+                      <Link to={`/course/${course.course_id}/lesson/1.1`} className="continue-btn">
                         Продолжить
                       </Link>
                     </div>
@@ -358,7 +380,10 @@ const ProfilePage = () => {
           userData.courses.map(course => (
             <div className="course-card-full" key={course.id}>
               <div className="course-imagee">
-                <img src="/api/placeholder/300/160" alt={course.course?.title || "Курс"} />
+                <img 
+                  src={getCourseImageUrl(course)} 
+                  alt={course.course?.title || "Курс"} 
+                />
               </div>
               <div className="course-details">
                 <h3>{course.course?.title || "Курс"}</h3>
@@ -371,7 +396,7 @@ const ProfilePage = () => {
               </div>
               <div className="course-actions">
                 <Link 
-                  to={`/course/${course.course_id}/lesson/1`} 
+                  to={`/course/${course.course_id}/lesson/1.1`} 
                   className="continue-btn"
                 >
                   {course.status === "completed" ? "Повторить" : "Продолжить"}
@@ -398,7 +423,17 @@ const ProfilePage = () => {
           userData.certificates.map(cert => (
             <div className="certificate-card-full" key={cert.id}>
               <div className="certificate-image">
-                <img src={cert.image} alt={cert.name} />
+                {/* Находим соответствующий курс */}
+                {userData.courses
+                  .filter(course => course.course_id === cert.id)
+                  .map(course => (
+                    <img 
+                      key={course.id}
+                      src={getCourseImageUrl(course)} 
+                      alt={cert.name} 
+                    />
+                  ))
+                }
               </div>
               <div className="certificate-details">
                 <h3>{cert.name}</h3>

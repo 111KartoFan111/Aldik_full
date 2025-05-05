@@ -17,6 +17,7 @@ class Course(Base):
     description = Column(Text, nullable=False)
     duration = Column(Integer, nullable=False)  # Продолжительность в минутах
     xp_reward = Column(Integer, nullable=False, default=0)  # XP за прохождение курса
+    image_url = Column(String, nullable=True)  # URL изображения курса
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     

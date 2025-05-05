@@ -8,7 +8,7 @@ import easyIcon from '../../assets/images/easy-icon.svg';
 import mediumIcon from '../../assets/images/medium-icon.svg';
 import hardIcon from '../../assets/images/hard-icon.svg';
 
-// Получение иконки сложности
+// Функция для получения иконки сложности - объявлена на уровне модуля
 const getDifficultyIcon = (difficulty) => {
   switch(difficulty?.toLowerCase()) {
     case 'easy': return easyIcon;
@@ -18,7 +18,7 @@ const getDifficultyIcon = (difficulty) => {
   }
 };
 
-// Получение цвета для сложности
+// Функция для получения цвета для сложности - объявлена на уровне модуля
 const getDifficultyColor = (difficulty) => {
   switch(difficulty?.toLowerCase()) {
     case 'easy': return 'green';
@@ -26,6 +26,43 @@ const getDifficultyColor = (difficulty) => {
     case 'hard': return 'red';
     default: return 'green';
   }
+};
+
+// Функция для получения URL изображения курса - объявлена на уровне модуля
+const getCourseImageUrl = (course) => {
+  // Если у курса есть image_url, используем его
+  if (course && course.image_url) {
+    // Если URL начинается с http, это полный URL
+    if (course.image_url.startsWith('http')) {
+      return course.image_url;
+    }
+    // Если URL начинается с /, это относительный путь от корня сервера
+    if (course.image_url.startsWith('/')) {
+      return `http://localhost:8000${course.image_url}`;
+    }
+    // Иначе, это относительный путь
+    return `http://localhost:8000/${course.image_url}`;
+  }
+  
+  // Если нет image_url, определяем по названию
+  if (course && course.title) {
+    if (course.title.includes('JavaScript')) {
+      return '/api/placeholder/400/320';
+    } else if (course.title.includes('Python')) {
+      return '/api/placeholder/400/320';
+    } else if (course.title.includes('HTML') || course.title.includes('CSS')) {
+      return '/api/placeholder/400/320';
+    } else if (course.title.includes('React')) {
+      return '/api/placeholder/400/320';
+    } else if (course.title.includes('C++')) {
+      return '/api/placeholder/400/320';
+    } else if (course.title.includes('C#')) {
+      return '/api/placeholder/400/320';
+    }
+  }
+  
+  // По умолчанию
+  return '/api/placeholder/400/320';
 };
 
 const CourseModal = ({ isOpen, onClose, courseId = null, languageName = null, onViewAllClick = () => {} }) => {
@@ -139,7 +176,7 @@ const CourseModal = ({ isOpen, onClose, courseId = null, languageName = null, on
                   onClick={() => setSelectedCourse(course)}
                 >
                   <div className="course-card-image-container">
-                    <img src="/api/placeholder/400/320" alt={course.title} className="course-card-image" />
+                    <img src={getCourseImageUrl(course)} alt={course.title} className="course-card-image" />
                   </div>
                   <div className="course-card-content">
                     <h3 className="course-card-title">{course.title}</h3>
@@ -156,7 +193,7 @@ const CourseModal = ({ isOpen, onClose, courseId = null, languageName = null, on
               <div className="course-modal-content">
                 <div className="course-header">
                   <div className="course-image-container">
-                    <img src="/api/placeholder/260/180" alt={selectedCourse.title} className="course-image" />
+                    <img src={getCourseImageUrl(selectedCourse)} alt={selectedCourse.title} className="course-image" />
                   </div>
                   
                   <div className="course-title-section">
@@ -299,7 +336,11 @@ export const CourseGrid = ({ onCourseClick }) => {
             onClick={() => onCourseClick(course.id)}
           >
             <div className="course-card-image-container">
-              <img src="/api/placeholder/400/320" alt={course.title} className="course-card-image" />
+              <img 
+                src={getCourseImageUrl(course)} 
+                alt={course.title} 
+                className="course-card-image" 
+              />
             </div>
             <div className="course-card-content">
               <h3 className="course-card-title">{course.title}</h3>

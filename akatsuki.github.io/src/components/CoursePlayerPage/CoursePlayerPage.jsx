@@ -95,6 +95,26 @@ const CoursePlayerPage = () => {
     if (xp < 3000) return "Джонин";
     return "Каге";
   };
+
+  // Функция для получения URL изображения курса
+const getCourseImageUrl = (course) => {
+  // Если у курса есть image_url, используем его
+  if (course && course.image_url) {
+    // Если URL начинается с http, это полный URL
+    if (course.image_url.startsWith('http')) {
+      return course.image_url;
+    }
+    // Если URL начинается с /, это относительный путь от корня сервера
+    if (course.image_url.startsWith('/')) {
+      return `http://localhost:8000${course.image_url}`;
+    }
+    // Иначе, это относительный путь
+    return `http://localhost:8000/${course.image_url}`;
+  }
+  
+  // По умолчанию
+  return '/api/placeholder/400/320';
+};
   
   // Функция для получения максимального XP для текущего ранга
   const getMaxXP = (rank) => {
@@ -658,33 +678,20 @@ const CoursePlayerPage = () => {
       <Header />
       <div className="player-content">
         <aside className={`player-sidebar ${menuOpen ? "sidebar-open" : ""}`}>
-          <div className="course-info">
-            <h2 className="course-title">{currentCourse?.title || "Загрузка..."}</h2>
-            <div className="xp-container">
-              <div className="xp-text">
-                <span>Прогресс XP:</span>
-                <span>{xp} / {xpToNextLevel}</span>
+        <div className="course-info">
+          {currentCourse && (
+            <div className="course-header-info">
+              <div className="course-image-small">
+                <img 
+                  src={getCourseImageUrl(currentCourse)} 
+                  alt={currentCourse.title}
+                  style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover', marginRight: '10px' }}
+                />
               </div>
-              <div className="xp-bar">
-                <div className="xp-fill" style={{width: `${progress}%`}}></div>
-              </div>
+              <h2 className="course-title">{currentCourse.title || "Загрузка..."}</h2>
             </div>
-            <div className="course-selector">
-              <label htmlFor="coursePicker">Выбрать курс:</label>
-              <select 
-                id="coursePicker"
-                value={courseId}
-                onChange={(e) => changeCourse(e.target.value)}
-                className="course-select"
-              >
-                {allCourses.map(course => (
-                  <option key={course.id} value={course.id}>
-                    {course.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          )}
+        </div>
           
           <div className="course-navigation">
             {courseModules.map((module, moduleIndex) => (
@@ -979,6 +986,15 @@ const CoursePlayerPage = () => {
                         />
                       )}
                     </div>
+                    
+                    <div className="course-image-certificate" style={{ margin: '10px auto', maxWidth: '120px' }}>
+                      <img 
+                        src={currentCourse ? getCourseImageUrl(currentCourse) : '/api/placeholder/120/120'} 
+                        alt={currentCourse?.title || "Курс"} 
+                        style={{ width: '100%', borderRadius: '8px', objectFit: 'cover' }}
+                      />
+                    </div>
+                    
                     <p className="cert-text">Этот сертификат подтверждает, что</p>
                     <p className="cert-name">{userData?.nickname || localStorage.getItem('userNickname') || "Ученик"}</p>
                     <p className="cert-text">успешно завершил курс</p>
@@ -1008,6 +1024,13 @@ const CoursePlayerPage = () => {
                         .slice(0, 3)
                         .map(course => (
                           <div key={course.id} className="recommended-course">
+                            <div className="course-card-image-container" style={{ marginBottom: '10px' }}>
+                              <img 
+                                src={getCourseImageUrl(course)} 
+                                alt={course.title} 
+                                style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                              />
+                            </div>
                             <h4>{course.title}</h4>
                             <button 
                               className="btn-outline"

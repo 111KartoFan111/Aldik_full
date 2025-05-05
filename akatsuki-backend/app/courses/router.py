@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List, Any, Optional
 from datetime import datetime
+import os
+import shutil
+from uuid import uuid4
 
 from app.database import get_db
 from app.auth.jwt import get_current_user
@@ -16,6 +19,45 @@ router = APIRouter(
     prefix="/api/courses",
     tags=["Курсы"],
 )
+
+@router.post("/upload-image/{course_id}", response_model=CourseResponse)
+async def upload_course_image(
+    course_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> Any:
+    """
+    Загрузка изображения для курса
+    """
+    # Проверяем, существует ли курс
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if not course:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Курс не найден"
+        )
+    
+    # Создаем директорию для изображений курсов, если ее нет
+    images_dir = "static/images/courses"
+    os.makedirs(images_dir, exist_ok=True)
+    
+    # Генерируем уникальное имя файла
+    file_extension = file.filename.split(".")[-1]
+    filename = f"{uuid4()}.{file_extension}"
+    file_path = f"{images_dir}/{filename}"
+    
+    # Сохраняем файл
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # Обновляем URL изображения курса
+    course.image_url = f"/static/images/courses/{filename}"
+    db.add(course)
+    db.commit()
+    db.refresh(course)
+    
+    return course
 
 @router.get("/my-courses/{user_id}", response_model=List[UserCourseResponse])
 def get_user_courses(
